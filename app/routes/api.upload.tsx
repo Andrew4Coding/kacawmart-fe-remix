@@ -13,6 +13,8 @@ export async function action(args: ActionFunctionArgs) {
             { status: 201 }
         );
     } catch (error) {
+        console.log(error);
+        
         return Response.json({ error: 'Something went wrong' }, { status: 500 });
     }
 }

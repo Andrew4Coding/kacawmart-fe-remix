@@ -9,7 +9,7 @@ export async function uploadFile(file: File, key: string): Promise<string | unde
             body: formData,
         });
 
-        const data: { url: string, success: boolean } = (await response).json() as any;
+        const data: { url: string, success: boolean } = await (await response).json();
 
         if (data.success) {
             return data.url;

@@ -126,6 +126,9 @@ export function RegisterForm() {
                 `${data.username}`,
             );
 
+            console.log(profileImageUrl);
+            
+
             if (!profileImageUrl) {
                 setError("An error occurred while uploading the profile photo");
                 return;
