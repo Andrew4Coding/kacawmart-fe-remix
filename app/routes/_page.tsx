@@ -8,7 +8,10 @@ const restrictedRoutes = ['/'];
 
 export async function loader(args: LoaderFunctionArgs) {
     const token = await getTokenFromRequest(args.request);
+
+    console.log('token', token);
     
+
     return {
         token
     };

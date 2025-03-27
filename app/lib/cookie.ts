@@ -6,13 +6,10 @@ export const tokenCookie = createCookie('token', {
     maxAge: 60 * 60 * 24 * 5,
 });
 
-
-export function getTokenFromRequest(request: Request) {
-
+export async function getTokenFromRequest(request: Request) {
     const cookieHeader = request.headers.get("Cookie");
-    const cookies = Object.fromEntries(
-        (cookieHeader || "").split("; ").map((c) => c.split("="))
-    );
-    
-    return cookies.token as {token: string | undefined};
+
+    const token = tokenCookie.parse(cookieHeader);
+
+    return token;
 }

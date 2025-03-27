@@ -4,7 +4,7 @@ export async function uploadFile(file: File, key: string): Promise<string | unde
     formData.append('key', key);
 
     try {
-        const response = fetch('/api/upload', {
+        const response = fetch('/upload', {
             method: 'POST',
             body: formData,
         });
