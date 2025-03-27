@@ -51,7 +51,7 @@ const GENDER = {
     P: "P",
 } as const;
 
-const registerSchema = z.object({
+const customerRegisterSchema = z.object({
     username: z.string(),
     email: z.string().email(),
     password: z
@@ -83,16 +83,22 @@ const registerSchema = z.object({
     isEnable2Fa: z.boolean(),
 });
 
-type RegisterFormValues = z.infer<typeof registerSchema>;
+const sellerRegisterSchema = customerRegisterSchema.extend({
+    bankName: z.string(),
+    bankNumber: z.string(),
+})
+
+type CustomerRegisterFormValues = z.infer<typeof customerRegisterSchema>;
+type SellerRegisterFormValues = z.infer<typeof sellerRegisterSchema>;
 
 export function RegisterForm() {
     const navigate = useNavigate();
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [currentTab, setCurrentTab] = useState("personal");
+    const [currentTab, setCurrentTab] = useState("customer");
 
-    const form = useForm<RegisterFormValues>({
-        resolver: zodResolver(registerSchema),
+    const customerForm = useForm<CustomerRegisterFormValues>({
+        resolver: zodResolver(customerRegisterSchema),
         defaultValues: {
             gender: "L",
             birthdate: new Date(),
@@ -100,7 +106,16 @@ export function RegisterForm() {
         },
     });
 
-    async function onSubmit(data: RegisterFormValues) {
+    const sellerForm = useForm<SellerRegisterFormValues>({
+        resolver: zodResolver(sellerRegisterSchema),
+        defaultValues: {
+            gender: "L",
+            birthdate: new Date(),
+            isEnable2Fa: false,
+        }
+    });
+
+    async function onSubmit(data: CustomerRegisterFormValues | SellerRegisterFormValues) {
         setIsLoading(true);
         setError(null);
 
@@ -125,9 +140,6 @@ export function RegisterForm() {
                 data.profileAttachment as File,
                 `${data.username}`,
             );
-
-            console.log(profileImageUrl);
-            
 
             if (!profileImageUrl) {
                 setError("An error occurred while uploading the profile photo");
@@ -157,7 +169,7 @@ export function RegisterForm() {
     }
 
     return (
-        <Card className="w-full">
+        <Card className="w-full bg">
             <CardHeader>
                 <CardTitle className="text-2xl">Register</CardTitle>
                 <CardDescription>Create a new account to get started</CardDescription>
@@ -169,90 +181,95 @@ export function RegisterForm() {
                         <AlertDescription>{error}</AlertDescription>
                     </Alert>
                 )}
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <Tabs value={currentTab} onValueChange={setCurrentTab}>
-                            <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="personal">Personal Info</TabsTrigger>
-                                <TabsTrigger value="address">Address & Details</TabsTrigger>
-                            </TabsList>
 
-                            <TabsContent value="personal" className="space-y-4 mt-4">
+                <Tabs value={currentTab} onValueChange={setCurrentTab}>
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="customer">Customer</TabsTrigger>
+                        <TabsTrigger value="seller">Seller</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="customer" className="space-y-4 mt-4">
+                        <Form {...customerForm}>
+                            <form onSubmit={customerForm.handleSubmit(onSubmit)} className="space-y-6">
+                                <div
+                                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                                >
+                                    <FormField
+                                        control={customerForm.control}
+                                        name="username"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Username</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="Username" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={customerForm.control}
+                                        name="email"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Email</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="email"
+                                                        placeholder="email@example.com"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={customerForm.control}
+                                        name="password"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Password</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="password"
+                                                        placeholder="••••••••"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={customerForm.control}
+                                        name="fullname"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Full Name</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="John Doe" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={customerForm.control}
+                                        name="phone"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Phone Number</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="+1234567890" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                                 <FormField
-                                    control={form.control}
-                                    name="username"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Username</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="Username" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="email"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Email</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="email"
-                                                    placeholder="email@example.com"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="password"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Password</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="password"
-                                                    placeholder="••••••••"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="fullname"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Full Name</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="John Doe" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="phone"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Phone Number</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="+1234567890" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
+                                    control={customerForm.control}
                                     name="profileAttachment"
                                     render={({ field: { value, onChange, ...fieldProps } }) => (
                                         <FormItem>
@@ -260,10 +277,10 @@ export function RegisterForm() {
                                             <FormControl>
                                                 <FileInput
                                                     file={
-                                                        form.getValues(`profileAttachment`) as File | null
+                                                        customerForm.getValues(`profileAttachment`) as File | null
                                                     }
                                                     onFileChange={(file: File) => {
-                                                        form.setValue(`profileAttachment`, file);
+                                                        customerForm.setValue(`profileAttachment`, file);
                                                     }}
                                                     secondaryMessage="Upload a profile photo"
                                                     asterisk
@@ -274,19 +291,9 @@ export function RegisterForm() {
                                         </FormItem>
                                     )}
                                 />
-                                <div className="flex justify-end">
-                                    <Button
-                                        type="button"
-                                        onClick={() => setCurrentTab("address")}
-                                    >
-                                        Next
-                                    </Button>
-                                </div>
-                            </TabsContent>
 
-                            <TabsContent value="address" className="space-y-4 mt-4">
                                 <FormField
-                                    control={form.control}
+                                    control={customerForm.control}
                                     name="city"
                                     render={({ field }) => (
                                         <FormItem>
@@ -299,7 +306,7 @@ export function RegisterForm() {
                                     )}
                                 />
                                 <FormField
-                                    control={form.control}
+                                    control={customerForm.control}
                                     name="province"
                                     render={({ field }) => (
                                         <FormItem>
@@ -312,7 +319,7 @@ export function RegisterForm() {
                                     )}
                                 />
                                 <FormField
-                                    control={form.control}
+                                    control={customerForm.control}
                                     name="postal"
                                     render={({ field }) => (
                                         <FormItem>
@@ -325,7 +332,7 @@ export function RegisterForm() {
                                     )}
                                 />
                                 <FormField
-                                    control={form.control}
+                                    control={customerForm.control}
                                     name="gender"
                                     render={({ field }) => (
                                         <FormItem>
@@ -349,7 +356,7 @@ export function RegisterForm() {
                                     )}
                                 />
                                 <FormField
-                                    control={form.control}
+                                    control={customerForm.control}
                                     name="birthdate"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
@@ -389,28 +396,288 @@ export function RegisterForm() {
                                         </FormItem>
                                     )}
                                 />
-                                <div className="flex justify-between">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => setCurrentTab("personal")}
-                                    >
-                                        Back
-                                    </Button>
+                                <div className="flex w-full">
                                     <Button
                                         type="submit"
                                         disabled={isLoading}
                                         onClick={() => {
-                                            console.log(form.getValues());
+                                            console.log(customerForm.getValues());
                                         }}
+                                        className="w-full"
                                     >
                                         {isLoading ? "Registering..." : "Register"}
                                     </Button>
                                 </div>
-                            </TabsContent>
-                        </Tabs>
-                    </form>
-                </Form>
+                            </form>
+                        </Form>
+                    </TabsContent>
+
+                    <TabsContent value="seller" className="space-y-4 mt-4">
+                        <Form {...sellerForm}>
+                            <form onSubmit={sellerForm.handleSubmit(onSubmit)} className="space-y-6">
+                                <div
+                                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                                >
+                                    <FormField
+                                        control={sellerForm.control}
+                                        name="username"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Username</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="Username" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={sellerForm.control}
+                                        name="email"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Email</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="email"
+                                                        placeholder="email@example.com"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={sellerForm.control}
+                                        name="password"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Password</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="password"
+                                                        placeholder="••••••••"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={sellerForm.control}
+                                        name="fullname"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Full Name</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="John Doe" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={sellerForm.control}
+                                        name="phone"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Phone Number</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="+1234567890" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                <FormField
+                                    control={sellerForm.control}
+                                    name="profileAttachment"
+                                    render={({ field: { value, onChange, ...fieldProps } }) => (
+                                        <FormItem>
+                                            <FormLabel>Profile Photo</FormLabel>
+                                            <FormControl>
+                                                <FileInput
+                                                    file={
+                                                        sellerForm.getValues(`profileAttachment`) as File | null
+                                                    }
+                                                    onFileChange={(file: File) => {
+                                                        sellerForm.setValue(`profileAttachment`, file);
+                                                    }}
+                                                    secondaryMessage="Upload a profile photo"
+                                                    asterisk
+                                                    className="w-full"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={sellerForm.control}
+                                    name="city"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>City</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="New York" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={sellerForm.control}
+                                    name="province"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Province/State</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="NY" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={sellerForm.control}
+                                    name="postal"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Postal/Zip Code</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="10001" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={sellerForm.control}
+                                    name="gender"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Gender</FormLabel>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Select gender" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="L">Male</SelectItem>
+                                                    <SelectItem value="P">Female</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={sellerForm.control}
+                                    name="birthdate"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel>Birthdate</FormLabel>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant={"outline"}
+                                                            className={cn(
+                                                                "w-full pl-3 text-left font-normal",
+                                                                !field.value && "text-muted-foreground",
+                                                            )}
+                                                        >
+                                                            {field.value ? (
+                                                                format(field.value, "PPP")
+                                                            ) : (
+                                                                <span>Pick a date</span>
+                                                            )}
+                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-0" align="start">
+                                                    <Calendar
+                                                        mode="single"
+                                                        selected={field.value}
+                                                        onSelect={field.onChange}
+                                                        disabled={(date) =>
+                                                            date > new Date() || date < new Date("1900-01-01")
+                                                        }
+                                                        initialFocus
+                                                    />
+                                                </PopoverContent>
+                                            </Popover>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={sellerForm.control}
+                                    name="bankName"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Bank Name</FormLabel>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value}
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Select bank" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="BCA">BCA</SelectItem>
+                                                    <SelectItem value="Mandiri">Mandiri</SelectItem>
+                                                    <SelectItem value="BNI">BNI</SelectItem>
+                                                    <SelectItem value="BRI">BRI</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={sellerForm.control}
+                                    name="bankNumber"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Bank Account Number</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="1234567890" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <div className="flex w-full">
+                                    <Button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        onClick={() => {
+                                            console.log(sellerForm.getValues());
+                                        }}
+                                        className="w-full"
+                                    >
+                                        {isLoading ? "Registering..." : "Register"}
+                                    </Button>
+                                </div>
+                            </form>
+                        </Form>
+                    </TabsContent>
+                </Tabs>
             </CardContent>
             <CardFooter className="flex justify-center">
                 <p className="text-sm text-muted-foreground">

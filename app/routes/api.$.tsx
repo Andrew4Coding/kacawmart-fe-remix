@@ -8,6 +8,11 @@ const REAL_API_URL = process.env.API_URL || "http://localhost:8000";
 export const loader: LoaderFunction = async ({ request }) => {
     const token = await getTokenFromRequest(request);
 
+    console.log("NGENTOD");
+    
+    console.log(request.headers.get("Cookie"));
+    
+
     const url = new URL(request.url);
     const realApiResponse = await fetch(`${REAL_API_URL}${url.pathname}`, {
         headers: {
@@ -42,6 +47,9 @@ export const action: ActionFunction = async ({ request }) => {
             JSON.stringify(body)
             : null,
     });
+
+    console.log(realApiResponse);
+    
 
     if (!realApiResponse.ok) {
         throw new Response("Failed to send data", { status: realApiResponse.status });

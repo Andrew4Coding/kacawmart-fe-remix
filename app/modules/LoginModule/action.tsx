@@ -10,7 +10,7 @@ export async function loginUser(data: LoginData) {
             body: JSON.stringify(data),
         });
 
-        const responseData: { token: string; message: string } = await response.json();
+        const responseData: { message: string } = await response.json();
 
     
         if (!response.ok) {

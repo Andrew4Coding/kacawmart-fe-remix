@@ -27,11 +27,9 @@ export const action: ActionFunction = async ({ request }) => {
 
     const responseData: { token: string, message: string } = await realApiResponse.json();
 
-
-    console.log(responseData);
-    
-
-    return json(responseData, {
+    return json({
+        message: responseData.message
+    }, {
         headers: {
             'Set-Cookie': await tokenCookie.serialize(responseData.token),
         },
