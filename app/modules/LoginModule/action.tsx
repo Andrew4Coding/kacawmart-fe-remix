@@ -11,6 +11,7 @@ export async function loginUser(data: LoginData) {
                 "Content-Type": "application/json",
             },
             credentials: "include",
+            mode : "cors",
             body: JSON.stringify(data),
         });
 
