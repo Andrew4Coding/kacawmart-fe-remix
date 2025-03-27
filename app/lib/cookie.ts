@@ -8,6 +8,11 @@ export const tokenCookie = createCookie('token', {
 
 
 export function getTokenFromRequest(request: Request) {
-    const cookieHeader = request.headers.get('Cookie');
-    return tokenCookie.parse(cookieHeader);
+
+    const cookieHeader = request.headers.get("Cookie");
+    const cookies = Object.fromEntries(
+        (cookieHeader || "").split("; ").map((c) => c.split("="))
+    );
+    
+    return cookies.token as {token: string | undefined};
 }
