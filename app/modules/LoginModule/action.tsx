@@ -1,20 +1,17 @@
-type LoginData = {
+export type LoginData = {
     username: string;
     password: string;
 };
 
 export async function loginUser(data: LoginData) {
     try {
-        const response = await fetch("http://localhost:8000/auth/login", {
+        const response = await fetch("/api/login", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
             body: JSON.stringify(data),
         });
 
         const responseData: { token: string; message: string } = await response.json();
+
     
         if (!response.ok) {
             return {
