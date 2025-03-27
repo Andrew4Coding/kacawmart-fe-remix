@@ -7,11 +7,6 @@ export async function loginUser(data: LoginData) {
     try {
         const response = await fetch("/api/login", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-            mode : "cors",
             body: JSON.stringify(data),
         });
 
