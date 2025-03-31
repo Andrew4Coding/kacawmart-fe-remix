@@ -1,5 +1,5 @@
-import LoginPage from "~/modules/LoginModule";
+import LoginModule from "~/modules/LoginModule";
 
-export default function HomePage() {
-  return <LoginPage />
+export default function LoginPage() {
+  return <LoginModule />
 }

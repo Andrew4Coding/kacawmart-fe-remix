@@ -11,10 +11,12 @@ type RegisterData = {
     phone: string;
     profileImageUrl: string;
     isEnable2Fa: boolean;
+    bankName?: string;
+    bankNumber?: string;
 };
 
 export async function registerUser(data: RegisterData) {
-    const response = await fetch("http://localhost:8000/auth/register", {
+    const response = await fetch(`/api/auth/register/${data.bankName ? 'seller' : 'customer'}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
