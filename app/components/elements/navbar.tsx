@@ -12,7 +12,7 @@ export default function Navbar() {
   const data: sessionData = useLoaderData();
   
   return (
-    <nav className="w-full fixed top-0 z-10 font-open px-10 bg-[#F1FFFA]">
+    <nav className="w-full fixed top-0 z-10 font-open px-10 bg-[#F1FFFA] shadow-md">
       <div className="container mx-auto flex justify-between items-center py-6">
         <Link to="/" className="text-xl font-bold font-libre text-[#009579] lg:min-w-[300px]">
           KACAWMart

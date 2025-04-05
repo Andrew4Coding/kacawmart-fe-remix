@@ -9,7 +9,7 @@ export async function loader(args: LoaderFunctionArgs) {
             headers: {
                 Cookie: args.request.headers.get('Cookie') || '',
             }
-        }
+        },
     });
 
     return redirect('/login');
