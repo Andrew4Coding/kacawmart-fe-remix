@@ -1,21 +1,14 @@
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { getTokenFromRequest } from "~/lib/cookie";
 
-const REAL_API_URL = process.env.API_URL || "http://localhost:8000";
+const AUTH_URL = process.env.AUTH_URL || "http://localhost:4000";
 
 // Handle GET requests
 export const loader: LoaderFunction = async ({ request }) => {
-    const token = await getTokenFromRequest(request);
-
-    console.log(request.headers.get("Cookie"));
-    
-
     const url = new URL(request.url);
-    const realApiResponse = await fetch(`${REAL_API_URL}${url.pathname}`, {
+    const realApiResponse = await fetch(`${AUTH_URL}${url.pathname.replaceAll('api', 'proxy')}`, {
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Cookie: request.headers.get("Cookie") || "",
         },
         credentials: "include",
     });
@@ -24,15 +17,23 @@ export const loader: LoaderFunction = async ({ request }) => {
 
     if (!realApiResponse.ok) {
         throw new Response(JSON.stringify({
-            message: responseData.message || "Failed to fetch data",
+            message: responseData.error || "Failed to fetch data",
             status: realApiResponse.status,
-        }), { status: realApiResponse.status });
+        }), {
+            status: realApiResponse.status,
+            headers: {
+                "Content-Type": "application/json",
+            }
+         });
     }
 
     return new Response(JSON.stringify({
-        message: responseData.message,
+        ... responseData
     }), {
         status: realApiResponse.status,
+        headers: {
+            "Content-Type": "application/json",
+        }
     });
 };
 
@@ -41,13 +42,11 @@ export const action: ActionFunction = async ({ request }) => {
     const url = new URL(request.url);
     const body = await request.json();
 
-    const token = await getTokenFromRequest(request);
-
-    const realApiResponse = await fetch(`${REAL_API_URL}${url.pathname}`, {
+    const realApiResponse = await fetch(`${AUTH_URL}${url.pathname.replaceAll('api', 'proxy')}`, {
         method: request.method,
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Cookie: request.headers.get("Cookie") || "",
         },
         credentials: "include",
         body: request.method !== "GET" ?
@@ -59,9 +58,14 @@ export const action: ActionFunction = async ({ request }) => {
 
     if (!realApiResponse.ok) {
         throw new Response(JSON.stringify({
-            message: responseData.message || "Failed to fetch data",
+            message: responseData.error || "Failed to fetch data",
             status: realApiResponse.status,
-        }), { status: realApiResponse.status });
+        }), {
+            status: realApiResponse.status,
+            headers: {
+                "Content-Type": "application/json",
+            }
+         });
     }
 
 
@@ -70,5 +74,8 @@ export const action: ActionFunction = async ({ request }) => {
         token: responseData.token,
     }), {
         status: realApiResponse.status,
+        headers: {
+            "Content-Type": "application/json",
+        }
     });
 };
