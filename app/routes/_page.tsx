@@ -2,19 +2,19 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { Outlet } from "@remix-run/react";
 import Footer from "~/components/elements/footer";
 import Navbar from "~/components/elements/navbar";
-import { getTokenFromRequest } from "~/lib/cookie";
-
-const restrictedRoutes = ['/'];
+import { getServerAuthClient } from "~/lib/auth-client";
 
 export async function loader(args: LoaderFunctionArgs) {
-    const token = await getTokenFromRequest(args.request);
+    const authClient = getServerAuthClient();
+    const session = await authClient.getSession({
+        fetchOptions: {
+            headers: {
+                Cookie: args.request.headers.get('Cookie') || '',
+            }
+        }
+    });
 
-    console.log('token', token);
-    
-
-    return {
-        token
-    };
+    return session.data?.user ?? null;
 }
 
 export default function PageLayout() {

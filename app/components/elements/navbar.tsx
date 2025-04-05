@@ -3,9 +3,14 @@ import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Menu } from "lucide-react";
 
-export default function Navbar() {
-  const data: { token: string | null } = useLoaderData();
+interface sessionData { 
+  email: string;
+  name: string;
+}
 
+export default function Navbar() {
+  const data: sessionData = useLoaderData();
+  
   return (
     <nav className="w-full fixed top-0 z-10 font-open px-10 bg-[#F1FFFA]">
       <div className="container mx-auto flex justify-between items-center py-6">
@@ -21,7 +26,7 @@ export default function Navbar() {
           </li>
         </ul>
         {
-          data.token ?
+          data ?
             <Link to="/logout" className="hidden lg:flex lg:min-w-[300px] justify-end">
               <Button>
                 Logout
@@ -48,7 +53,7 @@ export default function Navbar() {
                 <Link to="/transaction">My Transaction</Link>
               </li>
               {
-                data.token ?
+                data ?
                   <Link to="/logout" className="my-2 w-full">
                     <Button className="w-full">
                       Logout

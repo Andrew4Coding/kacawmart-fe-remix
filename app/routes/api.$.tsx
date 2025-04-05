@@ -19,12 +19,21 @@ export const loader: LoaderFunction = async ({ request }) => {
         },
         credentials: "include",
     });
+    
+    const responseData = await realApiResponse.json();
 
     if (!realApiResponse.ok) {
-        throw new Response("Failed to fetch data", { status: realApiResponse.status });
+        throw new Response(JSON.stringify({
+            message: responseData.message || "Failed to fetch data",
+            status: realApiResponse.status,
+        }), { status: realApiResponse.status });
     }
 
-    return json(await realApiResponse.json());
+    return new Response(JSON.stringify({
+        message: responseData.message,
+    }), {
+        status: realApiResponse.status,
+    });
 };
 
 // Handle POST, PUT, DELETE, etc.
@@ -46,14 +55,20 @@ export const action: ActionFunction = async ({ request }) => {
             : null,
     });
 
-    console.log(realApiResponse);
-    
+    const responseData = await realApiResponse.json();
 
     if (!realApiResponse.ok) {
-        throw new Response("Failed to send data", { status: realApiResponse.status });
+        throw new Response(JSON.stringify({
+            message: responseData.message || "Failed to fetch data",
+            status: realApiResponse.status,
+        }), { status: realApiResponse.status });
     }
 
-    const responseData: { token: string, message: string } = await realApiResponse.json();
 
-    return json(responseData);
+    return new Response(JSON.stringify({
+        message: responseData.message,
+        token: responseData.token,
+    }), {
+        status: realApiResponse.status,
+    });
 };
