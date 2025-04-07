@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 
-export default function homeLoader(args: LoaderFunctionArgs) {
+export default async function homeLoader(args: LoaderFunctionArgs) {
     return null;
 }

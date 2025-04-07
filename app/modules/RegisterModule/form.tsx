@@ -43,6 +43,7 @@ import {
     SelectValue,
 } from "~/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { getServerAuthClient } from "~/lib/auth-client";
 import { uploadFile } from "~/lib/file";
 import { cn } from "~/lib/utils";
 import { registerUser } from "./action";
@@ -97,6 +98,11 @@ export function RegisterForm() {
     const [isLoading, setIsLoading] = useState(false);
     const [currentTab, setCurrentTab] = useState("customer");
 
+<<<<<<< HEAD
+=======
+    const authClient = getServerAuthClient()
+
+>>>>>>> d388d3d5f5e2d0e87221adaa05ef7747411e8f13
     const customerForm = useForm<CustomerRegisterFormValues>({
         resolver: zodResolver(customerRegisterSchema),
         defaultValues: {
@@ -146,21 +152,37 @@ export function RegisterForm() {
                 return;
             }
 
-            // In a real app, this would call your registration API
-            const result = await registerUser({
-                ...data,
-                profileImageUrl: profileImageUrl,
-                birthdate: new Date(data.birthdate),
-            });
+            const { profileAttachment, ... body} = data;
 
-            if (result.success) {
-                toast.success("Registration successful");
-                navigate("/login");
-            } else {
-                console.log(result);
+            await authClient.signUp.email(
+                {
+                    email: data.email,
+                    name: data.fullname,
+                    password: data.password,
+                },
+                {
+                    throw: false,
+                    onSuccess: async () => {
+                        // In a real app, this would call your registration API
+                        const result = await registerUser({
+                            ...body,
+                            profileImageUrl: profileImageUrl,
+                            birthdate: new Date(data.birthdate),
+                        });
 
-                setError(result.message || "An error occurred during registration");
-            }
+
+                        if (result.success) {
+                            toast.success("Registration successful");
+                            navigate("/login");
+                        } else {
+                            setError(result.message || "An error occurred during registration");
+                        }
+                    },
+                    onError: (ctx) => {
+                        setError(ctx.error.message);
+                    }
+                }
+            )
         } catch (error) {
             setError("An unexpected error occurred");
         } finally {

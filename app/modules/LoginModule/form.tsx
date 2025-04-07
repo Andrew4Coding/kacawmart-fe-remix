@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { Link, useNavigate } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 import { AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "~/components/ui/alert";
@@ -25,7 +25,7 @@ import {
     FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { loginUser } from "./action";
+import { getServerAuthClient } from "~/lib/auth-client";
 
 const loginSchema = z.object({
     username: z.string().min(1, "Email or username is required"),
@@ -35,9 +35,9 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-    const navigate = useNavigate();
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const authClient = getServerAuthClient();
 
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
@@ -51,25 +51,21 @@ export function LoginForm() {
         setIsLoading(true);
         setError(null);
 
-        try {
-            const result = await loginUser(data);
-
-            if (result.success) {
+        await authClient.signIn.email({
+            email: data.username,
+            password: data.password,
+            callbackURL: '/',
+            rememberMe: true,
+        }, {
+            onSuccess: () => {
                 toast.success("Login successful");
-                navigate("/");
-            } else {
-                console.log(result.message);
-                
-                setError(result.message || "An error occurred during login");
-            }
-        } catch (error) {
-            console.log(error);
-            
-            toast.error("An unexpected error occurred");
-            setError("An unexpected error occurred");
-        } finally {
-            setIsLoading(false);
-        }
+            },
+            onError: (ctx) => {
+                toast.error(ctx.error.message);
+                setError(ctx.error.message);
+            },
+        })
+        setIsLoading(false);
     }
 
     return (

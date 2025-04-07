@@ -1,12 +1,16 @@
-import { redirect } from "@remix-run/node";
-import { tokenCookie } from "~/lib/cookie";
+import { LoaderFunctionArgs, redirect } from "@remix-run/node";
+import { getServerAuthClient } from "~/lib/auth-client";
 
-export async function loader() {
-    return redirect('/', {
-        headers: {
-            'Set-Cookie': await tokenCookie.serialize('', {
-                maxAge: 0,
-            }),
-        }
+export async function loader(args: LoaderFunctionArgs) {
+    const authClient = getServerAuthClient();
+
+    authClient.signOut({
+        fetchOptions: {
+            headers: {
+                Cookie: args.request.headers.get('Cookie') || '',
+            }
+        },
     });
+
+    return redirect('/login');
 }
