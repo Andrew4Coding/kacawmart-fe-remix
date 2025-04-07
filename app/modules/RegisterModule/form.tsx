@@ -98,11 +98,8 @@ export function RegisterForm() {
     const [isLoading, setIsLoading] = useState(false);
     const [currentTab, setCurrentTab] = useState("customer");
 
-<<<<<<< HEAD
-=======
     const authClient = getServerAuthClient()
 
->>>>>>> d388d3d5f5e2d0e87221adaa05ef7747411e8f13
     const customerForm = useForm<CustomerRegisterFormValues>({
         resolver: zodResolver(customerRegisterSchema),
         defaultValues: {
