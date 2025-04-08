@@ -39,5 +39,7 @@ export default function Index() {
         }
         );
     }, [])
-    return <ProfileModule />;
+    return <ProfileModule
+        
+    />;
 }
