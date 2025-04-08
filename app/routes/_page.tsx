@@ -15,11 +15,18 @@ export async function loader(args: LoaderFunctionArgs) {
     });
     const currentPath = new URL(args.request.url).pathname;
 
-    if (!session.data && currentPath !== '/login') {
-        return redirect('/login');
-    }
-    else if (session.data?.user && !session.data?.user.emailVerified && !currentPath.includes('/otp')) {
-        return redirect('/otp');
+    if (!session.data) {
+        if (currentPath !== '/login' && !currentPath.startsWith('/register')) {
+            return redirect('/login');
+        }
+    } else if (!session.data.user?.emailVerified) {
+        if (!currentPath.includes('/otp')) {
+            return redirect('/otp');
+        }
+    } else {
+        if (currentPath === '/login' || currentPath.startsWith('/register')) {
+            return redirect('/');
+        }
     }
 
     return session.data?.user ?? null;
