@@ -1,67 +1,108 @@
-import { useState } from "react"
+import { useLoaderData, useOutletContext } from "@remix-run/react"
+import { format } from "date-fns"
 import {
-    User,
-    MapPin,
     Calendar,
-    Phone,
-    Mail,
-    Shield,
+    Camera,
+    ChevronRight,
     Clock,
     Edit2,
-    Camera,
-    Save,
-    X,
-    ChevronRight,
     LogOut,
+    Mail,
+    MapPin,
+    Phone,
+    Save,
+    Shield,
+    User,
+    X,
 } from "lucide-react"
-import { format } from "date-fns"
+import { useState } from "react"
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
-import { Badge } from "~/components/ui/badge"
-import { Switch } from "~/components/ui/switch"
-import { Label } from "~/components/ui/label"
 import { Input } from "~/components/ui/input"
-import { Separator } from "~/components/ui/separator"
+import { Label } from "~/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
+import { Separator } from "~/components/ui/separator"
+import { Switch } from "~/components/ui/switch"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 
 // Sample user data based on the model
-const userData = {
-    id: "user_123456",
-    name: "Alex Johnson",
-    email: "alex.johnson@example.com",
-    emailVerified: true,
-    image: "https://randomuser.me/api/portraits/men/32.jpg",
-    createdAt: new Date("2022-03-15T10:30:00"),
-    updatedAt: new Date("2023-11-20T14:45:00"),
-    UserData: {
-        id: "userdata_123456",
-        city: "San Francisco",
-        province: "California",
-        postal: "94105",
-        gender: "MALE",
-        birthdate: new Date("1990-06-12T00:00:00"),
-        phone: "+1 (555) 123-4567",
-        profileImageUrl: "https://randomuser.me/api/portraits/men/32.jpg",
-        isEnable2Fa: true,
-        lastLogin: new Date("2023-12-01T08:15:00"),
-        createdAt: new Date("2022-03-15T10:30:00"),
-        updatedAt: new Date("2023-11-20T14:45:00"),
-        walletId: "wallet_123456",
-        userId: "user_123456",
-    },
+// const userData = {
+//     id: "user_123456",
+//     name: "Alex Johnson",
+//     email: "alex.johnson@example.com",
+//     emailVerified: true,
+//     image: "https://randomuser.me/api/portraits/men/32.jpg",
+//     createdAt: new Date("2022-03-15T10:30:00"),
+//     updatedAt: new Date("2023-11-20T14:45:00"),
+//     UserData: {
+//         id: "userdata_123456",
+//         city: "San Francisco",
+//         province: "California",
+//         postal: "94105",
+//         gender: "MALE",
+//         birthdate: new Date("1990-06-12T00:00:00"),
+//         phone: "+1 (555) 123-4567",
+//         profileImageUrl: "https://randomuser.me/api/portraits/men/32.jpg",
+//         isEnable2Fa: true,
+//         lastLogin: new Date("2023-12-01T08:15:00"),
+//         createdAt: new Date("2022-03-15T10:30:00"),
+//         updatedAt: new Date("2023-11-20T14:45:00"),
+//         walletId: "wallet_123456",
+//         userId: "user_123456",
+//     },
+// }
+
+interface userDataType {
+    id: string;
+    city: string;
+    province: string;
+    postal: string;
+    gender: "MALE" | "FEMALE";
+    birthdate: Date;
+    phone: string;
+    profileImageUrl: string;
+    isEnable2Fa: boolean;
+    lastLogin: Date;
+    createdAt: Date;
+    updatedAt: Date;
+    walletId: string | null;
+    userId: string;
+    wallet: {
+        id: string;
+        balance: number;
+        userId: string;
+    };
+    Customer: Array<{
+        id: string;
+        category: string[];
+        userId: string;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    Seller: Array<any>;
 }
 
 export default function ProfileModule() {
     const [isEditing, setIsEditing] = useState(false)
     const [activeTab, setActiveTab] = useState("personal")
+
+
+    const contextData: {
+        email: string;
+        emailVerified: boolean;
+        name: string;
+        role: string;
+    } = useOutletContext();
+    const data: userDataType = useLoaderData();
+
     const [editedData, setEditedData] = useState({
-        name: userData.name,
-        phone: userData.UserData.phone,
-        city: userData.UserData.city,
-        province: userData.UserData.province,
-        postal: userData.UserData.postal,
+        name: contextData.name,
+        phone: data.phone,
+        city: data.city,
+        province: data.province,
+        postal: data.postal,
     })
 
     const handleEditToggle = () => {
@@ -74,7 +115,9 @@ export default function ProfileModule() {
         }
     }
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: 
+    React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
         const { name, value } = e.target
         setEditedData((prev) => ({
             ...prev,
@@ -84,16 +127,16 @@ export default function ProfileModule() {
 
     const cancelEdit = () => {
         setEditedData({
-            name: userData.name,
-            phone: userData.UserData.phone,
-            city: userData.UserData.city,
-            province: userData.UserData.province,
-            postal: userData.UserData.postal,
+            name: contextData.name,
+            phone: data.phone,
+            city: data.city,
+            province: data.province,
+            postal: data.postal,
         })
         setIsEditing(false)
     }
 
-    const getInitials = (name) => {
+    const getInitials = (name: string) => {
         return name
             .split(" ")
             .map((part) => part[0])
@@ -111,9 +154,9 @@ export default function ProfileModule() {
                             <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
                                 <div className="relative">
                                     <Avatar className="w-32 h-32 border-4 border-white">
-                                        <AvatarImage src={userData.UserData.profileImageUrl} alt={userData.name} />
+                                        <AvatarImage src={data.profileImageUrl} alt={contextData.name} />
                                         <AvatarFallback className="text-2xl bg-emerald-100 text-emerald-700">
-                                            {getInitials(userData.name)}
+                                            {getInitials(contextData.name)}
                                         </AvatarFallback>
                                     </Avatar>
                                     <button className="absolute bottom-0 right-0 bg-emerald-600 text-white p-2 rounded-full shadow-lg hover:bg-emerald-700 transition-colors">
@@ -124,11 +167,11 @@ export default function ProfileModule() {
                         </div>
 
                         <CardContent className="pt-20 pb-6 text-center">
-                            <h2 className="text-2xl font-bold text-gray-900 mt-2">{userData.name}</h2>
-                            <p className="text-gray-500">{userData.email}</p>
+                            <h2 className="text-2xl font-bold text-gray-900 mt-2">{contextData.name}</h2>
+                            <p className="text-gray-500">{contextData.email}</p>
 
                             <div className="flex justify-center mt-4">
-                                {userData.emailVerified ? (
+                                {contextData.emailVerified ? (
                                     <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors">
                                         Email Verified
                                     </Badge>
@@ -145,7 +188,7 @@ export default function ProfileModule() {
                                         <Calendar className="h-5 w-5 text-gray-500 mr-3" />
                                         <div>
                                             <p className="text-sm font-medium text-gray-900">Member Since</p>
-                                            <p className="text-xs text-gray-500">{format(userData.createdAt, "MMMM d, yyyy")}</p>
+                                            <p className="text-xs text-gray-500">{format(data.createdAt, "MMMM d, yyyy")}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -156,7 +199,7 @@ export default function ProfileModule() {
                                         <div>
                                             <p className="text-sm font-medium text-gray-900">Last Login</p>
                                             <p className="text-xs text-gray-500">
-                                                {format(userData.UserData.lastLogin, "MMMM d, yyyy 'at' h:mm a")}
+                                                {format(data.lastLogin, "MMMM d, yyyy 'at' h:mm a")}
                                             </p>
                                         </div>
                                     </div>
@@ -167,11 +210,11 @@ export default function ProfileModule() {
                                         <Shield className="h-5 w-5 text-gray-500 mr-3" />
                                         <div>
                                             <p className="text-sm font-medium text-gray-900">Two-Factor Auth</p>
-                                            <p className="text-xs text-gray-500">{userData.UserData.isEnable2Fa ? "Enabled" : "Disabled"}</p>
+                                            <p className="text-xs text-gray-500">{data.isEnable2Fa ? "Enabled" : "Disabled"}</p>
                                         </div>
                                     </div>
                                     <Switch
-                                        checked={userData.UserData.isEnable2Fa}
+                                        checked={data.isEnable2Fa}
                                         onCheckedChange={() => { }}
                                         className="data-[state=checked]:bg-emerald-600"
                                     />
@@ -251,7 +294,7 @@ export default function ProfileModule() {
                                                 ) : (
                                                     <div className="flex items-center h-10 px-3 rounded-md border border-gray-200 bg-gray-50">
                                                         <User className="h-4 w-4 text-gray-500 mr-2" />
-                                                        <span>{userData.name}</span>
+                                                        <span>{contextData.name}</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -260,7 +303,7 @@ export default function ProfileModule() {
                                                 <Label htmlFor="email">Email Address</Label>
                                                 <div className="flex items-center h-10 px-3 rounded-md border border-gray-200 bg-gray-50">
                                                     <Mail className="h-4 w-4 text-gray-500 mr-2" />
-                                                    <span>{userData.email}</span>
+                                                    <span>{contextData.email}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -269,7 +312,7 @@ export default function ProfileModule() {
                                             <div className="space-y-2">
                                                 <Label htmlFor="gender">Gender</Label>
                                                 {isEditing ? (
-                                                    <Select defaultValue={userData.UserData.gender}>
+                                                    <Select defaultValue={data.gender}>
                                                         <SelectTrigger>
                                                             <SelectValue placeholder="Select gender" />
                                                         </SelectTrigger>
@@ -282,9 +325,9 @@ export default function ProfileModule() {
                                                 ) : (
                                                     <div className="flex items-center h-10 px-3 rounded-md border border-gray-200 bg-gray-50">
                                                         <span>
-                                                            {userData.UserData.gender === "MALE"
+                                                            {data.gender === "MALE"
                                                                 ? "Male"
-                                                                : userData.UserData.gender === "FEMALE"
+                                                                : data.gender === "FEMALE"
                                                                     ? "Female"
                                                                     : "Other"}
                                                         </span>
@@ -298,12 +341,12 @@ export default function ProfileModule() {
                                                     <Input
                                                         id="birthdate"
                                                         type="date"
-                                                        defaultValue={format(userData.UserData.birthdate, "yyyy-MM-dd")}
+                                                        defaultValue={format(data.birthdate, "yyyy-MM-dd")}
                                                     />
                                                 ) : (
                                                     <div className="flex items-center h-10 px-3 rounded-md border border-gray-200 bg-gray-50">
                                                         <Calendar className="h-4 w-4 text-gray-500 mr-2" />
-                                                        <span>{format(userData.UserData.birthdate, "MMMM d, yyyy")}</span>
+                                                        <span>{format(data.birthdate, "MMMM d, yyyy")}</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -321,7 +364,7 @@ export default function ProfileModule() {
                                                 ) : (
                                                     <div className="flex items-center h-10 px-3 rounded-md border border-gray-200 bg-gray-50">
                                                         <Phone className="h-4 w-4 text-gray-500 mr-2" />
-                                                        <span>{userData.UserData.phone}</span>
+                                                        <span>{data.phone}</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -341,7 +384,7 @@ export default function ProfileModule() {
                                                     ) : (
                                                         <div className="flex items-center h-10 px-3 rounded-md border border-gray-200 bg-gray-50">
                                                             <MapPin className="h-4 w-4 text-gray-500 mr-2" />
-                                                            <span>{userData.UserData.city}</span>
+                                                            <span>{data.city}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -355,7 +398,7 @@ export default function ProfileModule() {
                                                         />
                                                     ) : (
                                                         <div className="flex items-center h-10 px-3 rounded-md border border-gray-200 bg-gray-50">
-                                                            <span>{userData.UserData.province}</span>
+                                                            <span>{data.province}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -369,7 +412,7 @@ export default function ProfileModule() {
                                                         />
                                                     ) : (
                                                         <div className="flex items-center h-10 px-3 rounded-md border border-gray-200 bg-gray-50">
-                                                            <span>{userData.UserData.postal}</span>
+                                                            <span>{data.postal}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -393,12 +436,12 @@ export default function ProfileModule() {
                                                 </div>
                                                 <div className="flex items-center space-x-2">
                                                     <Switch
-                                                        checked={userData.UserData.isEnable2Fa}
+                                                        checked={data.isEnable2Fa}
                                                         onCheckedChange={() => { }}
                                                         className="data-[state=checked]:bg-emerald-600"
                                                     />
                                                     <span className="text-sm font-medium text-gray-700">
-                                                        {userData.UserData.isEnable2Fa ? "Enabled" : "Disabled"}
+                                                        {data.isEnable2Fa ? "Enabled" : "Disabled"}
                                                     </span>
                                                 </div>
                                             </div>
@@ -426,7 +469,7 @@ export default function ProfileModule() {
                                                         <div>
                                                             <p className="text-sm font-medium">Profile Updated</p>
                                                             <p className="text-xs text-gray-500">
-                                                                {format(userData.updatedAt, "MMMM d, yyyy 'at' h:mm a")}
+                                                                {format(data.updatedAt, "MMMM d, yyyy 'at' h:mm a")}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -441,7 +484,7 @@ export default function ProfileModule() {
                                                         <div>
                                                             <p className="text-sm font-medium">Last Successful Login</p>
                                                             <p className="text-xs text-gray-500">
-                                                                {format(userData.UserData.lastLogin, "MMMM d, yyyy 'at' h:mm a")}
+                                                                {format(data.lastLogin, "MMMM d, yyyy 'at' h:mm a")}
                                                             </p>
                                                         </div>
                                                     </div>
