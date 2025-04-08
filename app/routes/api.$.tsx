@@ -8,6 +8,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     const realApiResponse = await fetch(`${AUTH_URL}${url.pathname.replaceAll('api', 'proxy')}`, {
         headers: {
             "Content-Type": "application/json",
+            "Accept": "application/json",
             Cookie: request.headers.get("Cookie") || "",
         },
         credentials: "include",
@@ -23,6 +24,7 @@ export const loader: LoaderFunction = async ({ request }) => {
             status: realApiResponse.status,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json",
             }
          });
     }
@@ -33,6 +35,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         status: realApiResponse.status,
         headers: {
             "Content-Type": "application/json",
+            "Accept": "application/json",
         }
     });
 };
@@ -64,6 +67,7 @@ export const action: ActionFunction = async ({ request }) => {
             status: realApiResponse.status,
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json",
             }
          });
     }
@@ -76,6 +80,7 @@ export const action: ActionFunction = async ({ request }) => {
         status: realApiResponse.status,
         headers: {
             "Content-Type": "application/json",
+            "Accept": "application/json",
         }
     });
 };

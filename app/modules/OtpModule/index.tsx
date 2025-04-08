@@ -15,9 +15,12 @@ export default function OtpModule() {
     const [isVerifying, setIsVerifying] = useState(false)
     const [isSending, setIsSending] = useState(false)
 
-    const data: { email: string } = useOutletContext();
+    const [isSent, setIsSent] =  useState(false)
+
+    const data: { email: string, emailVerified: boolean } = useOutletContext();
     const email = data.email
-    
+
+    const auth = getServerAuthClient()
 
     const navigate = useNavigate();
 
@@ -32,9 +35,9 @@ export default function OtpModule() {
     async function sendOtp() {
         if (cooldown > 0) return
 
+        setIsSent(true)
         setIsSending(true)
         try {
-            const auth = getServerAuthClient()
             await auth.emailOtp.sendVerificationOtp({
                 email: data.email,
                 type: "email-verification",
@@ -58,7 +61,6 @@ export default function OtpModule() {
 
         setIsVerifying(true)
         try {
-            const auth = getServerAuthClient()
             const { data, error } = await auth.emailOtp.verifyEmail({
                 email: email,
                 otp,
@@ -121,7 +123,7 @@ export default function OtpModule() {
                             ) : isSending ? (
                                 "Sending..."
                             ) : (
-                                "Resend OTP"
+                                `${!isSent ? 'Send' : 'Resend'} OTP`
                             )}
                         </Button>
                     </div>
