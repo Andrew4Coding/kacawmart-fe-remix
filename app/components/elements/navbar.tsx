@@ -1,7 +1,8 @@
 import { Link, useLoaderData, useLocation } from "@remix-run/react"
-import { Button } from "~/components/ui/button"
-import { Menu, X, ShoppingBag, Home, Receipt, LogOut, LogIn, ChevronDown, User } from "lucide-react"
+import { ChevronDown, Home, LogIn, LogOut, Menu, Package, Receipt, ShoppingBag, User, X } from "lucide-react"
+import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import { Button } from "~/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,12 +11,41 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
-import { useState, useEffect } from "react"
 import { cn } from "~/lib/utils"
 
 interface SessionData {
   email: string
   name: string
+}
+
+interface NavbarNavigationProps {
+  name: string;
+  path: string;
+  icon: React.ReactNode;
+}
+
+const navbarNavigationData: NavbarNavigationProps[] = [
+  { name: "Home", path: "/", icon: <Home className="h-4 w-4" /> },
+  { name: "Products", path: "/products", icon: <Package className="h-4 w-4" /> },
+  { name: "My Transactions", path: "/transaction", icon: <Receipt className="h-4 w-4" /> },
+]
+
+const NavbarNavigation: React.FC<NavbarNavigationProps> = ({ name, path, icon }) => {
+  const location = useLocation()
+  const isActive = location.pathname === path
+
+  return (
+    <Link
+      to={path}
+      className={cn(
+        "px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-1",
+        isActive ? "text-emerald-700 bg-emerald-100" : "text-gray-700 hover:text-emerald-600 hover:bg-emerald-50",
+      )}
+    >
+      {icon}
+      <span>{name}</span>
+    </Link>
+  )
 }
 
 export default function Navbar() {
@@ -68,31 +98,9 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-1">
-          <Link
-            to="/"
-            className={cn(
-              "px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-1",
-              isActive("/")
-                ? "text-emerald-700 bg-emerald-100"
-                : "text-gray-700 hover:text-emerald-600 hover:bg-emerald-50",
-            )}
-          >
-            <Home className="h-4 w-4" />
-            <span>Home</span>
-          </Link>
-
-          <Link
-            to="/transaction"
-            className={cn(
-              "px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-1",
-              isActive("/transaction")
-                ? "text-emerald-700 bg-emerald-100"
-                : "text-gray-700 hover:text-emerald-600 hover:bg-emerald-50",
-            )}
-          >
-            <Receipt className="h-4 w-4" />
-            <span>My Transactions</span>
-          </Link>
+          {navbarNavigationData.map((item) => (
+            <NavbarNavigation key={item.path} {...item} />
+          ))}
         </div>
 
         {/* User Account Section */}
