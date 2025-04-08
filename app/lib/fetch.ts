@@ -1,12 +1,14 @@
-const REAL_API_URL = process.env.API_URL || "http://localhost:8000";
+export default async function fetchServer(req: Request, url: string, options: RequestInit, token?: string) {
+    const baseUrl = new URL(req.url);
+    const fetchUrl = `${baseUrl.origin}${url}`;
 
-export default async function fetchServer(url: string, options: RequestInit, token?: string) {
-    const response = await fetch(`${REAL_API_URL}${url}`, {
+    const response = await fetch(`${fetchUrl}`, {
         ...options,
         headers: {
             ...options.headers,
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
+            Cookie: req.headers.get('Cookie') || '',
         },
         credentials: 'include',
   });

@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import ProductCard from "./components/card";
 import Pagination from "./components/pagination";
+import { Link } from "@remix-run/react";
 
 export default function ProductModule() {
   return (
@@ -10,10 +11,14 @@ export default function ProductModule() {
               <h1 className="font-libre font-bold text-2xl">
                   All Products
               </h1>
-              <Button>
-                  <Plus />
-                  Add New Product
-              </Button>
+              <Link
+                to={"/products/create"}
+              >
+                <Button>
+                    <Plus />
+                    Add New Product
+                </Button>
+              </Link>
           </div>
           <div className="mt-10 grid grid-cols-4 gap-4">
               {
