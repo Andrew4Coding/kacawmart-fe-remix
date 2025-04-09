@@ -163,7 +163,7 @@ importers:
         specifier: ^8.4.38
         version: 8.5.3
       tailwindcss:
-        specifier: ^3.4.4
+        specifier: ^3.4.17
         version: 3.4.17
       typescript:
         specifier: ^5.1.6
