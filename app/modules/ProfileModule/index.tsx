@@ -39,7 +39,7 @@ const profileFormSchema = z.object({
     city: z.string().min(1, "City is required"),
     province: z.string().min(1, "Province/State is required"),
     postal: z.string().min(1, "Postal code is required"),
-    gender: z.enum(["M","F"]),
+    gender: z.enum(["P", "L"]),
     birthdate: z.date({
         required_error: "Birthdate is required",
     }),
@@ -53,7 +53,7 @@ interface userDataType {
     city: string
     province: string
     postal: string
-    gender: "M" | "F"
+    gender: "L" | "P"
     birthdate: Date
     phone: string
     profileImageUrl: string
@@ -75,14 +75,15 @@ interface userDataType {
         createdAt: Date
         updatedAt: Date
     }>
-    Seller: Array<any>
+    Seller: Array<any>,
+    authUrl: string
 }
 
 export default function ProfileModule() {
     const [isEditing, setIsEditing] = useState(false)
     const [activeTab, setActiveTab] = useState("personal")
     const [isSubmitting, setIsSubmitting] = useState(false)
-    
+
     const contextData: {
         email: string
         emailVerified: boolean
@@ -135,16 +136,42 @@ export default function ProfileModule() {
         setIsSubmitting(true)
 
         try {
-            // Here you would typically make an API call to update the user profile
-            // For example:
-            // await updateUserProfile(values);
+            fetch(`${data.authUrl}/user/edit/profile`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    Cookie: document.cookie,
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    ...values,
+                    birthdate: format(values.birthdate, "yyyy-MM-dd"),
+                }),
+            }).then((res) => {
+                if (res.status !== 200) {
+                    throw new Error("Healthcheck failed")
+                }
 
-            // Simulate API call with a timeout
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+                return res;
+            })
+                .then(async (res) => {
+                    const data = await res.json()
 
-            // Update successful
-            toast.success("Profile updated successfully")
-            setIsEditing(false)
+                    console.log("Profile data:", data);
+
+                    // Update successful
+                    toast.success("Profile updated successfully")
+                    setIsEditing(false)
+                })
+                .catch((err) => {
+                    console.error(err);
+                    // Handle error
+                    toast.error("Failed to update profile. Please try again.")
+                }
+                );
+
+
 
             // You might want to refresh the data here or update the context
             // For example:
@@ -181,7 +208,12 @@ export default function ProfileModule() {
                                             {getInitials(contextData.name)}
                                         </AvatarFallback>
                                     </Avatar>
-                                    <button className="absolute bottom-0 right-0 bg-emerald-600 text-white p-2 rounded-full shadow-lg hover:bg-emerald-700 transition-colors">
+                                    <button
+                                        onClick={() => {
+                                            // Handle image upload here
+                                            console.log("Upload new profile image")
+                                        }}
+                                        className="absolute bottom-0 right-0 bg-emerald-600 text-white p-2 rounded-full shadow-lg hover:bg-emerald-700 transition-colors">
                                         <Camera className="h-4 w-4" />
                                     </button>
                                 </div>
@@ -366,17 +398,17 @@ export default function ProfileModule() {
                                                                                 <SelectValue placeholder="Select gender" />
                                                                             </SelectTrigger>
                                                                             <SelectContent>
-                                                                                <SelectItem value="M">Male</SelectItem>
-                                                                                <SelectItem value="F">Female</SelectItem>
+                                                                                <SelectItem value="L">Male</SelectItem>
+                                                                                <SelectItem value="P">Female</SelectItem>
                                                                             </SelectContent>
                                                                         </Select>
                                                                     ) : (
                                                                         <div className="flex items-center h-10 px-3 rounded-md border border-gray-200 bg-gray-50">
                                                                             <span>
-                                                                                {field.value === "M"
-                                                                                    ? "M"
-                                                                                    : field.value === "F"
-                                                                                        ? "F"
+                                                                                {field.value === "L"
+                                                                                    ? "L"
+                                                                                    : field.value === "P"
+                                                                                        ? "P"
                                                                                         : "Other"}
                                                                             </span>
                                                                         </div>

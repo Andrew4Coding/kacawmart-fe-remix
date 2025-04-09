@@ -18,7 +18,11 @@ export async function loader(args: LoaderFunctionArgs) {
         if (!response.ok) {
             throw new Error(data.message);
         }
-        return data;
+
+        return {
+            ...data,
+            authUrl: process.env.AUTH_URL,
+        };
     }
 
     catch (error) {
