@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useLoaderData, useOutletContext } from "@remix-run/react"
+import { Link, useLoaderData, useOutletContext } from "@remix-run/react"
 import { format } from "date-fns"
 import {
     Calendar,
@@ -588,9 +588,13 @@ export default function ProfileModule() {
 
                                                 <div>
                                                     <h3 className="text-lg font-medium text-gray-900 mb-4">Password</h3>
-                                                    <Button variant="outline" className="w-full md:w-auto">
-                                                        Change Password
-                                                    </Button>
+                                                    <Link
+                                                        to="/forgot-password"
+                                                    >
+                                                        <Button variant="outline" className="w-full md:w-auto">
+                                                            Change Password
+                                                        </Button>
+                                                    </Link>
                                                 </div>
 
                                                 <Separator />

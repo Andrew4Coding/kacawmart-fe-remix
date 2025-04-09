@@ -16,7 +16,7 @@ export async function loader(args: LoaderFunctionArgs) {
     const currentPath = new URL(args.request.url).pathname;
 
     if (!session.data) {
-        if (currentPath !== '/login' && !currentPath.startsWith('/register')) {
+        if (currentPath !== '/login' && !currentPath.startsWith('/register') && !currentPath.startsWith('/forgot-password') && !currentPath.startsWith('/reset-password')) {
             return redirect('/login');
         }
     } else if (!session.data.user?.emailVerified) {
