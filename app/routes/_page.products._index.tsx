@@ -8,11 +8,11 @@ export async function loader(args: LoaderFunctionArgs) {
 
     console.log(data);
     
+
     return data;
 }
 
 export default function ProductPage() { 
     const data = useLoaderData()
-    console.log(data);
-    return <ProductModule products={data}/>
+    return <ProductModule products={data.products}/>
 }
