@@ -19,6 +19,9 @@ export default function Navbar() {
           <li className="mx-2">
             <Link to="/transaction">My Transaction</Link>
           </li>
+          <li className="mx-2">
+            <Link to="/kacawpay">KacawPay</Link>
+          </li>
         </ul>
         {
           data.token ?
