@@ -196,7 +196,7 @@ const formatPrice = (price, discount = 0) => {
     return <span className="text-lg font-bold text-emerald-600">${price.toFixed(2)}</span>
 }
 
-export default function HomeModule() {
+export default function LandingModule() {
     const [currentTestimonial, setCurrentTestimonial] = useState(0)
     const [isVisible, setIsVisible] = useState(false)
 

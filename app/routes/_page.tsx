@@ -15,6 +15,10 @@ export async function loader(args: LoaderFunctionArgs) {
     });
     const currentPath = new URL(args.request.url).pathname;
 
+    if (currentPath == '') {
+        return session.data?.user ?? null;
+    }
+
     if (!session.data) {
         if (currentPath !== '/login' && !currentPath.startsWith('/register') && !currentPath.startsWith('/forgot-password') && !currentPath.startsWith('/reset-password')) {
             return redirect('/login');

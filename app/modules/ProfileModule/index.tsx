@@ -193,6 +193,8 @@ export default function ProfileModule() {
             .toUpperCase()
     }
 
+    const [profileImage, setProfileImage] = useState<File | null>(null);
+
     return (
         <div className="container mx-auto py-10 px-4 md:px-6 max-w-6xl pt-40">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -216,6 +218,16 @@ export default function ProfileModule() {
                                         className="absolute bottom-0 right-0 bg-emerald-600 text-white p-2 rounded-full shadow-lg hover:bg-emerald-700 transition-colors">
                                         <Camera className="h-4 w-4" />
                                     </button>
+                                    <input type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            if (e.target.files && e.target.files[0]) {
+                                                const file = e.target.files[0]
+                                                setProfileImage(file)
+                                            }
+                                        }}
+                                    />
                                 </div>
                             </div>
                         </div>
