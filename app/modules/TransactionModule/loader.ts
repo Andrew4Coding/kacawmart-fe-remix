@@ -1,11 +1,9 @@
 import { LoaderFunction } from "@remix-run/node";
-import { getTokenFromRequest } from "~/lib/cookie";
 import fetchServer from "~/lib/fetch";
 
 const transactionLoader: LoaderFunction = async (args) => {
-    const token = await getTokenFromRequest(args.request);
-    const data = await fetchServer('/api/transaction/transactions', {}, token)
-
+    const data = await fetchServer(args.request, "/api/transaction/transactions", {});
+    
     return data;
 }
 
