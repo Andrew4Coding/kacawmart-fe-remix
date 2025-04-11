@@ -81,12 +81,12 @@ export default function ProductDetailModule({
           {/* Action buttons */}
           <div className="mt-8 flex justify-end space-x-4">
           <Link to={`/products/reviews/${id}`}>
-              <button className="border border-emerald-500 hover:bg-emerald-600 hover:text-white text-emerald-500 px-4 py-2 rounded">
+              <button className="border border-emerald-500 hover:bg-emerald-50 text-emerald-500 px-4 py-2 rounded">
                 View Reviews
               </button>
             </Link>
-            <Link to={`/products/${id}/edit`}>
-              <button className="border border-emerald-500 hover:bg-emerald-600 hover:text-white text-emerald-500 px-4 py-2 rounded">
+            <Link to={`/products/update/${id}`}>
+              <button className="border border-emerald-500 hover:bg-emerald-50 text-emerald-500 px-4 py-2 rounded">
                 Edit Details
               </button>
             </Link>

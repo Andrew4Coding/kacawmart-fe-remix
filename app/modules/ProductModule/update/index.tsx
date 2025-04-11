@@ -81,7 +81,7 @@ export default function ProductUpdateModule() {
                                         name="name"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Product Name</FormLabel>
+                                                <FormLabel>Name</FormLabel>
                                                 <FormControl>
                                                     <Input {...field} />
                                                 </FormControl>
@@ -140,7 +140,7 @@ export default function ProductUpdateModule() {
                                         name="stock"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Stock Quantity</FormLabel>
+                                                <FormLabel>Stock</FormLabel>
                                                 <FormControl>
                                                     <Input {...field} type="number" />
                                                 </FormControl>
@@ -157,7 +157,7 @@ export default function ProductUpdateModule() {
                                         name="image"
                                         render={({ field: { value, onChange, ...fieldProps } }) => (
                                             <FormItem>
-                                                <FormLabel>Profile Photo</FormLabel>
+                                                <FormLabel>Image</FormLabel>
                                                 <FormControl>
                                                     <FileInput
                                                         file={
@@ -182,13 +182,13 @@ export default function ProductUpdateModule() {
                             {/* Action buttons */}
                             <div className="mt-8 flex justify-end gap-4">
                                 <Button type="submit" className="bg-emerald-500 hover:bg-emerald-600">
-                                    CREATE
+                                    Create
                                 </Button>
                                 <Link
                                     to={`/product`}
                                 >
-                                    <Button type="button" variant="outline">
-                                        CANCEL
+                                    <Button type="button" variant="outline" className="hover:bg-emerald-50 text-emerald-500">
+                                        Cancel
                                     </Button>
                                 </Link>
                             </div>

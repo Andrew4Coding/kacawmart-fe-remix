@@ -74,7 +74,7 @@ export default function ProductCreateModule() {
         <div className="min-h-screen bg-[#f0faf5] p-20 pt-40">
             <div className="max-w-6xl mx-auto">
                 <div className="mb-6">
-                    <h1 className="text-3xl font-bold mb-2">Manage Product</h1>
+                    <h1 className="text-3xl font-bold mb-2">Manage</h1>
                     <div className="text-gray-600">
                         <Link to="/" className="hover:underline">
                             Home
@@ -102,7 +102,7 @@ export default function ProductCreateModule() {
                                         name="name"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Product Name</FormLabel>
+                                                <FormLabel>Name</FormLabel>
                                                 <FormControl>
                                                     <Input {...field} placeholder="Insert your product name here..."/>
                                                 </FormControl>
@@ -187,7 +187,7 @@ export default function ProductCreateModule() {
                                         name="stock"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Stock Quantity</FormLabel>
+                                                <FormLabel>Stock</FormLabel>
                                                 <FormControl>
                                                     <Input 
                                                         {...field} 
@@ -209,7 +209,7 @@ export default function ProductCreateModule() {
                                         name="image"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Product Image</FormLabel>
+                                                <FormLabel>Image</FormLabel>
                                                 <FormControl>
                                                     <FileInput
                                                         file={form.getValues("image") as File | null}

@@ -37,7 +37,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             <div className="text-gray-600 line-clamp-1">
               {truncateText(product.category[0]?.name || "Uncategorized", 12)}
             </div>
-            <div className="font-bold mt-1">₹{product.price.toFixed(2)}</div>
+            <div className="font-bold mt-1">${product.price.toFixed(2)}</div>
           </div>
         </div>
 

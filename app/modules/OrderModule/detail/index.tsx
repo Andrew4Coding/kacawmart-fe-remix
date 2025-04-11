@@ -68,14 +68,14 @@ export default function OrderDetailModule({ order }: OrderDetailProps) {
               All Orders
             </Link>{" "}
             {" > "}
-            <span>Order #{order.id.substring(0, 8)}</span>
+            <span>Order #{order.id}</span>
           </div>
         </div>
 
         <div className="bg-white p-8 rounded-lg shadow mb-8">
           <div className="flex flex-col md:flex-row justify-between mb-6 pb-6 border-b">
             <div>
-              <h2 className="text-xl font-semibold mb-2">Order #{order.id.substring(0, 8)}</h2>
+              <h2 className="text-xl font-semibold mb-2">Order #{order.id}</h2>
               <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <Calendar className="h-4 w-4" />
                 <span>Placed on {formatDatee(new Date(order.createdAt))}</span>
@@ -105,7 +105,7 @@ export default function OrderDetailModule({ order }: OrderDetailProps) {
                       <div className="flex-grow">
                         <h4 className="font-medium">{item.product?.name || "Product name unavailable"}</h4>
                         <div className="flex justify-between mt-2">
-                          <div className="text-sm text-gray-600">Qty: {item.amount}</div>
+                          <div className="text-sm text-gray-600">Quantity: {item.amount}</div>
                           <div className="font-medium">{formatCurrency((item.product?.price || 0) * item.amount)}</div>
                         </div>
                       </div>
