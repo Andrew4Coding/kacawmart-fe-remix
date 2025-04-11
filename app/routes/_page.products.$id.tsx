@@ -1,5 +1,36 @@
-import ProductDetailModule from "~/modules/ProductModule/detail";
+import type { LoaderFunctionArgs } from "@remix-run/node"
+import { useLoaderData } from "@remix-run/react"
+import fetchServer from "~/lib/fetch"
+import ProductReviewsSection from "~/modules/ProductModule/components/product-reviews-section"
+import ProductDetailModule from "~/modules/ProductModule/detail"
 
-export default function Index() { 
-    return <ProductDetailModule />
+export async function loader(args: LoaderFunctionArgs) {
+  const productId = args.params.id
+
+  if (!productId) {
+    throw new Error("Product ID is required")
+  }
+
+  // Fetch product details
+  const productData = await fetchServer(args.request, `/api/product/details/${productId}`)
+
+  // Fetch reviews data
+  const reviewsData = await fetchServer(args.request, `/api/product/reviews?productId=${productId}`)
+
+  return {
+    product: productData.product,
+    reviews: reviewsData.reviews || [],
+    ratingCount: reviewsData.ratingCount || 0,
+    productRating: reviewsData.productRating || 0,
+  }
+}
+
+export default function ProductPage() {
+  const data = useLoaderData<typeof loader>()
+
+  return (
+    <>
+      <ProductDetailModule product={data.product} />
+    </>
+  )
 }
