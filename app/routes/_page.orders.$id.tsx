@@ -125,3 +125,4 @@ export default function OrderDetailPage() {
 
   return <OrderDetailModule order={order} />
 }
+

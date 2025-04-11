@@ -69,11 +69,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           Manage
         </button>
         </Link>
-        <Link to={`/products/${product.id}/reviews`}>
-        <button className="w-full mt-2 bg-white border border-emerald-500 text-emerald-600 py-2 rounded-md flex items-center justify-center">
-          View Reviews
-        </button>
-        </Link>
       </div>
     </div>
   );
