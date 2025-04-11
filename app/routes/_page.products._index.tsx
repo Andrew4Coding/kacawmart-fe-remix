@@ -1,16 +1,18 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import fetchServer from "~/lib/fetch";
 import ProductModule from "~/modules/ProductModule";
 
 export async function loader(args: LoaderFunctionArgs) {
-    const data = await fetchServer(args.request, '/api/product/products')
+    const data = await fetchServer(args.request, '/api/product/filter')
 
     console.log(data);
     
 
-    return null;
+    return data;
 }
 
 export default function ProductPage() { 
-    return <ProductModule />
+    const data = useLoaderData()
+    return <ProductModule products={data.products}/>
 }
