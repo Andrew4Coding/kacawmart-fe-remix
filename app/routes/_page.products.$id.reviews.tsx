@@ -37,35 +37,35 @@ export default function ProductReviewsPage() {
   const data = useLoaderData<typeof loader>()
   console.log("masuk sini kagak si")
   return (
-    // <div className="min-h-screen bg-[#f0faf5] p-20 pt-40">
-    //   <div className="max-w-4xl mx-auto">
-    //     <div className="mb-6">
-    //       <div className="flex justify-between items-center">
-    //         <div>
-    //           <h1 className="text-3xl font-bold mb-2">{data.product.name} - Reviews</h1>
-    //           <div className="text-gray-600">
-    //             <Link to="/" className="hover:underline">
-    //               Home
-    //             </Link>{" "}
-    //             {" > "}
-    //             <Link to="/products" className="hover:underline">
-    //               All Products
-    //             </Link>{" "}
-    //             {" > "}
-    //             <Link to={`/products/${data.product.id}`} className="hover:underline">
-    //               {data.product.name}
-    //             </Link>{" "}
-    //             {" > "}
-    //             <span>Reviews</span>
-    //           </div>
-    //         </div>
-    //         <Link to={`/products/${data.product.id}`}>
-    //           <Button className="bg-emerald-500 hover:bg-emerald-600">
-    //             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Product
-    //           </Button>
-    //         </Link>
-    //       </div>
-    //     </div>
+    <div className="min-h-screen bg-[#f0faf5] p-20 pt-40">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">{data.product.name} - Reviews</h1>
+              <div className="text-gray-600">
+                <Link to="/" className="hover:underline">
+                  Home
+                </Link>{" "}
+                {" > "}
+                <Link to="/products" className="hover:underline">
+                  All Products
+                </Link>{" "}
+                {" > "}
+                <Link to={`/products/${data.product.id}`} className="hover:underline">
+                  {data.product.name}
+                </Link>{" "}
+                {" > "}
+                <span>Reviews</span>
+              </div>
+            </div>
+            <Link to={`/products/${data.product.id}`}>
+              <Button className="bg-emerald-500 hover:bg-emerald-600">
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back to Product
+              </Button>
+            </Link>
+          </div>
+        </div>
 
         <ReviewsModule
           productId={data.product.id}
@@ -73,7 +73,7 @@ export default function ProductReviewsPage() {
           ratingCount={data.ratingCount}
           reviews={data.reviews}
         />
-    //   </div>
-    // </div>
+      </div>
+    </div>
   )
 }

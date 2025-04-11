@@ -42,7 +42,7 @@ export default function ProductDetailModule({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold">Product Name</h2>
+                <h2 className="text-lg font-semibold">Name</h2>
                 <p className="text-gray-700">{product.name}</p>
               </div>
 
@@ -64,14 +64,14 @@ export default function ProductDetailModule({
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold">Stock Quantity</h2>
+                <h2 className="text-lg font-semibold">Stock</h2>
                 <p className="text-gray-700">{product.stock}</p>
               </div>
             </div>
 
             {/* Right column - Images */}
             <div>
-              <h2 className="text-lg font-semibold mb-4">Product Images</h2>
+              <h2 className="text-lg font-semibold mb-4">Product Image</h2>
               <div className="grid grid-cols-2 gap-4">
                 <img src={product.imageUrl || "/placeholder.svg"} alt="Product Image" className="rounded-lg shadow" />
               </div>

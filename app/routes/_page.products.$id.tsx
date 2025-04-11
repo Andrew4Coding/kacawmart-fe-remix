@@ -13,10 +13,10 @@ export async function loader(args: LoaderFunctionArgs) {
 
   // Fetch product details
   const productData = await fetchServer(args.request, `/api/product/details/${productId}`)
-
+  console.log("productData", productData)
   // Fetch reviews data
   const reviewsData = await fetchServer(args.request, `/api/product/reviews?productId=${productId}`)
-
+  
   return {
     product: productData.product,
     reviews: reviewsData.reviews || [],
