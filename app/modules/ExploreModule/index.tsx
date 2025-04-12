@@ -310,7 +310,7 @@ function ProductCard({ product }: { product: Product }) {
   const [isHovered, setIsHovered] = useState(false)
 
   return (
-    <Link to={`explore/product/${product.id}`} className="block">
+    <Link to={`product/${product.id}`} className="block">
       <Card
         className="overflow-hidden transition-all duration-300 hover:shadow-md group h-full"
         onMouseEnter={() => setIsHovered(true)}

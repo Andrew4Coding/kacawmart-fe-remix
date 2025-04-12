@@ -1,5 +1,5 @@
-import ProductDetailPage from "~/modules/ExploreModule/"; 
+import ProductDetailModule from "~/modules/ProductDetailModule";
 
-export default function ProductDetailPageRoute() { 
-  return <ProductDetailPage />;
+export default function ProductDetailPage() {
+  return <ProductDetailModule />
 }
