@@ -1,21 +1,23 @@
 export type Wallet = {
+  id?: string;
+  balance: number;
+  userId?: string;
+  lastTopUpDate?: string;
+};
+
+export type Voucher = {
+  id: string;
+  price: number;
+  createdAt: string;
+  discount: {
     id: string;
-    balance: number;
-    userId: string;
+    code: string;
+    value: number;
+    expiredAt: string;
   };
-  
-  export type Voucher = {
-    id: string;
-    price: number;
-    discount: {
-      value: number;
-      code: string;
-      expiredAt: string;
-    };
-  };
-  
-  export type OwnedVoucher = {
-    id: string;
-    voucher: Voucher;
-    createdAt: string;
-  };
+};
+
+export type LoaderData = {
+  wallet: Wallet;
+  vouchers: Voucher[];
+};

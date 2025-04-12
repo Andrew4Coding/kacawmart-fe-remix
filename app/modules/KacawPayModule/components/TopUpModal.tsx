@@ -1,4 +1,5 @@
 import { Form } from "@remix-run/react";
+import { Button } from "react-day-picker";
 
 export default function TopUpModal({ isOpen, onClose, walletBalance, isLoading }: {
   isOpen: boolean;
@@ -18,7 +19,7 @@ export default function TopUpModal({ isOpen, onClose, walletBalance, isLoading }
           </button>
         </div>
         
-        <Form method="post" action="/actions/topup" className="space-y-4">
+        <Form method="post" action="/api/wallet/topup" className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Amount
@@ -26,8 +27,6 @@ export default function TopUpModal({ isOpen, onClose, walletBalance, isLoading }
             <input
               type="number"
               name="amount"
-              min="10000"
-              step="10000"
               className="w-full px-3 py-2 border rounded-md"
               placeholder="Enter amount"
               required
@@ -58,7 +57,7 @@ export default function TopUpModal({ isOpen, onClose, walletBalance, isLoading }
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark disabled:opacity-50"
+              className="px-4 py-2 bg-green-500 text-black rounded-md hover:bg-primary-dark disabled:opacity-50"
             >
               {isLoading ? 'Processing...' : 'Submit Top Up'}
             </button>

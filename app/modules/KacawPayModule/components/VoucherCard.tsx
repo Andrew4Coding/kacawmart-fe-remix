@@ -1,27 +1,27 @@
+// app/modules/KacawPayModule/components/VoucherCard.tsx
 import { Form } from "@remix-run/react";
+import type { Voucher } from "../type";
 
 export default function VoucherCard({ 
   voucher, 
-  isOwned, 
-  dateAcquired, 
-  walletBalance 
+  isOwned = false,
+  dateAcquired,
+  walletBalance = 0
 }: {
-  voucher: any;
-  isOwned: boolean;
+  voucher: Voucher;
+  isOwned?: boolean;
   dateAcquired?: string;
   walletBalance?: number;
 }) {
-  const canBuy = !isOwned && walletBalance && walletBalance >= voucher.price;
+  const canBuy = !isOwned && walletBalance >= voucher.price;
 
   return (
     <div className="border rounded-lg p-4 hover:shadow-md transition">
       <div className="flex justify-between items-start mb-2">
         <h3 className="font-semibold text-lg">{voucher.discount.code}</h3>
-        {!isOwned && (
-          <span className="bg-primary text-white text-sm px-2 py-1 rounded">
-            Rp {voucher.price.toLocaleString('id-ID')}
-          </span>
-        )}
+        <span className="bg-primary text-white text-sm px-2 py-1 rounded">
+          Rp {voucher.price.toLocaleString('id-ID')}
+        </span>
       </div>
       
       <p className="text-gray-600 mb-2">

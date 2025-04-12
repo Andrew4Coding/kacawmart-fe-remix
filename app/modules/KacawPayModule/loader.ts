@@ -1,22 +1,35 @@
-import { LoaderFunction } from "@remix-run/node";
+// modules/KacawPayModule/loader.ts
+import { LoaderFunctionArgs } from "@remix-run/node";
 import { getTokenFromRequest } from "~/lib/cookie";
 import fetchServer from "~/lib/fetch";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const token = await getTokenFromRequest(request);
   
-  // Fetch wallet data
-  const wallet = await fetchServer('/api/wallet', {}, token);
-  
-  // Fetch available vouchers
-  const vouchers = await fetchServer('/api/vouchers', {}, token);
-  
-  // Fetch owned vouchers
-  const ownedVouchers = await fetchServer('/api/vouchers/owned', {}, token);
+  try {
+    // Use the original request directly with fetchServer
+    const [wallet, vouchers] = await Promise.all([
+      fetchServer(request, '/api/wallet', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }).catch(() => null), // Return null if request fails
+      fetchServer(request, '/api/vouchers', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }).catch(() => []) // Return empty array if request fails
+    ]);
 
-  return {
-    wallet,
-    vouchers,
-    ownedVouchers
-  };
+    return { 
+      wallet: wallet || { balance: 0 }, // Default wallet object if null
+      vouchers: vouchers || []
+    };
+  } catch (error) {
+    console.error("Loader error:", error);
+    return { 
+      wallet: { balance: 0 }, // Return default wallet object
+      vouchers: [] 
+    };
+  }
 };
