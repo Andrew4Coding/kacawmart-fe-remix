@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
 import { cn } from "~/lib/utils"
+import HomePage from "~/routes/_page._index"
 
 interface SessionData {
   email: string
@@ -26,8 +27,10 @@ interface NavbarNavigationProps {
 
 const navbarNavigationData: NavbarNavigationProps[] = [
   { name: "Home", path: "/", icon: <Home className="h-4 w-4" /> },
+  { name: "Beranda", path: "/HomePage", icon: <Home className="h-4 w-4" /> },
   { name: "Products", path: "/products", icon: <Package className="h-4 w-4" /> },
   { name: "My Transactions", path: "/transaction", icon: <Receipt className="h-4 w-4" /> },
+
 ]
 
 const NavbarNavigation: React.FC<NavbarNavigationProps> = ({ name, path, icon }) => {
