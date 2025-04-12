@@ -23,3 +23,14 @@ export function formatDate(dateString: string): string {
     day: 'numeric',
   }).format(date);
 }
+
+export function formatPrice(price: number): string {
+  // The price in the JSON seems to be in cents or smaller units
+  // Dividing by 100 to convert to dollars/main currency unit
+  const formattedPrice = (price / 100).toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+  })
+
+  return formattedPrice
+}
