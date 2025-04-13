@@ -101,11 +101,11 @@ export default function KacawPayModule() {
       )}
 
       {/* Top Up Modal */}
+      {/* Top Up Modal */}
       <TopUpModal 
         isOpen={showTopUpModal} 
         onClose={() => setShowTopUpModal(false)}
         walletBalance={wallet.balance || 0}
-        isLoading={false}
       />
     </div>
   );

@@ -1,17 +1,16 @@
 // ~/modules/KacawPayModule/actions.ts
-import { ActionFunction } from "@remix-run/node";
+import { ActionFunction, json } from "@remix-run/node";
 import { getTokenFromRequest } from "~/lib/cookie";
 import fetchServer from "~/lib/fetch";
 
 export const topUpAction: ActionFunction = async ({ request }) => {
   try {
-    // Get form data from the incoming request
-    const formData = await request.formData();
-    const amount = Number(formData.get('amount'));
-    const proofUrl = formData.get('proofUrl') as string;
+    // For application/json content type
+    const body = await request.json();
+    const { amount, proofUrl } = body;
 
     if (!amount || !proofUrl) {
-      return { error: "Amount and proof URL are required" };
+      return json({ error: "Amount and proof URL are required" }, 400);
     }
 
     // Create a new request for fetchServer with the correct URL and method
@@ -20,19 +19,19 @@ export const topUpAction: ActionFunction = async ({ request }) => {
       "/api/wallet/topup", 
       {
         method: 'POST',
-        body: JSON.stringify({ amount, proofUrl })
+        body: JSON.stringify({ amount: Number(amount), proofUrl })
       }
     );
     
-    // fetchServer already handles JSON parsing, so we can return the response directly
     return response;
   } catch (error) {
     console.error("Top-up error:", error);
-    return { 
+    return json({ 
+      success: false,
       error: error instanceof Error 
         ? error.message 
         : "Failed to process top up" 
-    };
+    }, 500);
   }
 };
 
