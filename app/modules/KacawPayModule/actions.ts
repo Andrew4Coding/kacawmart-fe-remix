@@ -36,33 +36,36 @@ export const topUpAction: ActionFunction = async ({ request }) => {
 };
 
 export const buyVoucherAction: ActionFunction = async ({ request }) => {
-  const token = await getTokenFromRequest(request);
-  const formData = await request.formData();
-  const voucherId = formData.get('voucherId') as string;
-
-  if (!voucherId) {
-    return { error: "Voucher ID is required" };
-  }
-
   try {
-    // Create a new request object for the API call
-    const apiRequest = new Request(request);
-    
-    // Modify the request for the API call
-    apiRequest.headers.set('Content-Type', 'application/json');
-    if (token) {
-      apiRequest.headers.set('Authorization', `Bearer ${token}`);
+    const token = await getTokenFromRequest(request);
+    const formData = await request.formData();
+    const voucherId = formData.get("voucherId");
+
+    if (!voucherId || typeof voucherId !== "string") {
+      return json({ success: false, error: "Voucher ID is required" }, 400);
     }
 
-    return await fetchServer(apiRequest, '/api/vouchers/purchase', {
-      method: 'POST',
-      body: JSON.stringify({ voucherId })
-    });
+    const body = JSON.stringify({ voucherId });
+
+    const response = await fetchServer(
+      request,
+      "/api/vouchers/purchase",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body
+      }
+    );
+
+    return response;
   } catch (error) {
-    return { 
-      error: error instanceof Error 
-        ? error.message 
-        : "Failed to purchase voucher" 
-    };
+    console.error("Voucher purchase error:", error);
+    return json({
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to purchase voucher"
+    }, 500);
   }
 };

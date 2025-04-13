@@ -1,15 +1,46 @@
 // modules/KacawPayModule/index.tsx
 import { useState } from "react";
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, useFetcher, useLoaderData } from "@remix-run/react";
 import TopUpModal from "./components/TopUpModal";
 import VoucherCard from "./components/VoucherCard";
 import { loader } from "./loader";
+import AvailableVouchersModal from "./components/AvailableVouchersModal";
+import BuyVoucherModal from "./components/BuyVoucherModal";
+import { Voucher } from "./type";
+
 
 export default function KacawPayModule() {
   const { wallet, vouchers } = useLoaderData<typeof loader>();
   const [activeTab, setActiveTab] = useState('wallet');
   const [showTopUpModal, setShowTopUpModal] = useState(false);
+  const [showBuyVoucherModal, setShowBuyVoucherModal] = useState(false);
+  const [showAvailableVouchersModal, setShowAvailableVouchersModal] = useState(false);
+  const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
+  const fetcher = useFetcher();
 
+  const handleBuyVoucher = (voucher: Voucher) => { // Added type annotation
+    setSelectedVoucher(voucher);
+    if (wallet.balance >= voucher.price) {
+      setShowBuyVoucherModal(true);
+    } else {
+      setShowBuyVoucherModal(true);
+    }
+  };
+
+  const confirmPurchase = () => {
+    if (!selectedVoucher) return;
+    
+    fetcher.submit(
+      JSON.stringify({ voucherId: selectedVoucher.id }), // Stringify the payload
+      {
+        method: "POST",
+        action: "/api/vouchers/purchase",
+        encType: "application/json", // Set content type
+      }
+    );
+    setShowBuyVoucherModal(false);
+    setSelectedVoucher(null);
+  };
   // Handle case when wallet data is not available
   if (!wallet) {
     return (
@@ -75,7 +106,15 @@ export default function KacawPayModule() {
       {/* Vouchers Tab */}
       {activeTab === 'vouchers' && (
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">My Vouchers</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">My Vouchers</h2>
+            <button 
+              onClick={() => setShowAvailableVouchersModal(true)}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+            >
+              Buy Voucher
+            </button>
+          </div>
           
           {voucherList.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -89,24 +128,36 @@ export default function KacawPayModule() {
           ) : (
             <p className="text-gray-500">No vouchers available</p>
           )}
-          
-          {/* Debug section - remove after testing */}
-          <div className="mt-8 p-4 bg-gray-100 rounded text-xs">
-            {/* <p>Debug info:</p>
-            <pre className="overflow-auto max-h-48">
-              {JSON.stringify({vouchers: voucherList}, null, 2)}
-            </pre> */}
-          </div>
         </div>
       )}
 
-      {/* Top Up Modal */}
       {/* Top Up Modal */}
       <TopUpModal 
         isOpen={showTopUpModal} 
         onClose={() => setShowTopUpModal(false)}
         walletBalance={wallet.balance || 0}
       />
+
+      {/* Available Vouchers Modal */}
+      <AvailableVouchersModal
+        isOpen={showAvailableVouchersModal}
+        onClose={() => setShowAvailableVouchersModal(false)}
+        onSelectVoucher={handleBuyVoucher}
+        walletBalance={wallet.balance || 0}
+      />
+
+      {/* Buy Voucher Confirmation Modal */}
+      <BuyVoucherModal
+        isOpen={showBuyVoucherModal} // Fixed: pass the state value, not the setter
+        onClose={() => {
+          setShowBuyVoucherModal(false);
+          setSelectedVoucher(null);
+        }}
+        onConfirm={confirmPurchase}
+        voucher={selectedVoucher}
+        walletBalance={wallet.balance || 0}
+      />
     </div>
   );
 }
+
