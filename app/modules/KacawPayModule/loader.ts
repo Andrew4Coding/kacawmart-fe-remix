@@ -8,27 +8,43 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   
   try {
     // Use the original request directly with fetchServer
-    const [wallet, vouchers] = await Promise.all([
+    const [walletResponse, vouchersResponse] = await Promise.all([
       fetchServer(request, '/api/wallet', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       }).catch(() => null), // Return null if request fails
-      fetchServer(request, '/api/vouchers', {
+      
+      // Using the correct endpoint
+      fetchServer(request, '/api/voucher/owned', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
-      }).catch(() => []) // Return empty array if request fails
+      }).catch(() => null) // Return null if request fails
     ]);
 
+    console.log('Wallet response:', walletResponse);
+    console.log('Vouchers response:', vouchersResponse);
+
+    // Extract vouchers data from the response structure
+    // Based on your backend, it's likely returning { success: true, data: [...] }
+    const vouchers = vouchersResponse?.success === true 
+      ? vouchersResponse.data 
+      : vouchersResponse?.data || vouchersResponse || [];
+
+    // Similarly handle wallet data
+    const wallet = walletResponse?.success === true
+      ? walletResponse.data
+      : walletResponse || { balance: 0 };
+
     return { 
-      wallet: wallet || { balance: 0 }, // Default wallet object if null
+      wallet: wallet || { balance: 0 }, 
       vouchers: vouchers || []
     };
   } catch (error) {
     console.error("Loader error:", error);
     return { 
-      wallet: { balance: 0 }, // Return default wallet object
+      wallet: { balance: 0 }, 
       vouchers: [] 
     };
   }
