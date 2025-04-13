@@ -43,12 +43,17 @@ export const loader: LoaderFunction = async ({ request }) => {
 // Handle POST, PUT, DELETE, etc.
 export const action: ActionFunction = async ({ request }) => {
     const url = new URL(request.url);
-    const body = await request.json();
+    let body = {};
+    try {
+        body = await request.json();
+    }
+    catch {}
 
     const realApiResponse = await fetch(`${AUTH_URL}${url.pathname.replaceAll('api', 'proxy')}`, {
         method: request.method,
         headers: {
             "Content-Type": "application/json",
+            "Accept": "application/json",
             Cookie: request.headers.get("Cookie") || "",
         },
         credentials: "include",
@@ -58,6 +63,7 @@ export const action: ActionFunction = async ({ request }) => {
     });
 
     const responseData = await realApiResponse.json();
+
 
     if (!realApiResponse.ok) {
         throw new Response(JSON.stringify({
