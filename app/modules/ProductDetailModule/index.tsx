@@ -494,7 +494,7 @@ export default function ProductDetailPage() {
             <Button variant="outline" onClick={() => setShowCartDialog(false)} className="sm:mr-2">
               Continue Shopping
             </Button>
-            <Button onClick={() => navigate(`/api/explore/product/${productId}/cart`)} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button onClick={() => navigate(`/cart`)} className="bg-emerald-600 hover:bg-emerald-700">
               View Cart
             </Button>
           </DialogFooter>
