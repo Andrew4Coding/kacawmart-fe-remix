@@ -35,7 +35,7 @@ export function formatDatee(date: Date): string {
 export function formatPrice(price: number): string {
   // The price in the JSON seems to be in cents or smaller units
   // Dividing by 100 to convert to dollars/main currency unit
-  const formattedPrice = (price / 100).toLocaleString("en-US", {
+  const formattedPrice = (price).toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
   })

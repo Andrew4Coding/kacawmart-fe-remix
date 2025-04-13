@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { toast } from "~/components/ui/use-toast"
-import { formatCurrency, formatDatee } from "~/lib/utils"
+import { formatCurrency, formatDatee, formatPrice } from "~/lib/utils"
 
 interface OrderProduct {
   id: string
@@ -173,7 +173,7 @@ export default function OrderDetailModule({ order }: OrderDetailProps) {
                         <h4 className="font-medium">{item.product?.name || "Product name unavailable"}</h4>
                         <div className="flex justify-between mt-2">
                           <div className="text-sm text-gray-600">Quantity: {item.amount}</div>
-                          <div className="font-medium">{formatCurrency((item.product?.price || 0) * item.amount)}</div>
+                          <div className="font-medium">{formatPrice(item.product.price)}</div>
                         </div>
                       </div>
                     </div>

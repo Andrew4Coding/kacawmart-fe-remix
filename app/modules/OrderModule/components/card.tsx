@@ -1,4 +1,4 @@
-import { formatDatee } from "~/lib/utils"
+import { formatDatee, formatPrice } from "~/lib/utils"
 import { Badge } from "~/components/ui/badge"
 import { Link } from "@remix-run/react"
 
@@ -35,14 +35,14 @@ export default function OrderCard({ order }: OrderCardProps) {
     }
   }
 
-  // Format price to currency
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      minimumFractionDigits: 0,
-    }).format(price / 100)
-  }
+  // // Format price to currency
+  // const formatPrice = (price: number) => {
+  //   return new Intl.NumberFormat("en-IN", {
+  //     style: "currency",
+  //     currency: "INR",
+  //     minimumFractionDigits: 0,
+  //   }).format(price / 100)
+  // }
 
   return (
     <Link to={`/orders/${order.id}`} className="block">
