@@ -1,47 +1,68 @@
-import { ActionFunctionArgs, json, redirect, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import ProductCreateModule from "~/modules/ProductModule/create";
-import { productSchema } from "~/modules/ProductModule/type";
-import { parse } from "cookie";
-import fetchServer from "~/lib/fetch";
-import { ArrowRightSquare } from "lucide-react";
+import { type ActionFunctionArgs, json, redirect, type LoaderFunctionArgs } from "@remix-run/node"
+import { useLoaderData } from "@remix-run/react"
+import ProductCreateModule from "~/modules/ProductModule/create"
+import { parse } from "cookie"
+import fetchServer from "~/lib/fetch"
 
+// Fix the import path to point to the correct location
+import { productSchema } from "~/modules/ProductModule/type"
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  try {
+    // Fetch the categories data
+    const response = await fetchServer(request, "/api/product/categories")
+
+    // Log the response for debugging
+    console.log("Categories API Response:", response)
+
+    // Return the categories data
+    return json({
+      categories: response?.categories || [],
+      // Include the raw response for debugging
+      _debug: {
+        rawResponse: response,
+      },
+    })
+  } catch (error) {
+    console.error("Error fetching categories:", error)
+    return json({
+      categories: [],
+      error: String(error),
+    })
+  }
+}
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-const cookieHeader = request.headers.get("Cookie");
-  const cookies = parse(cookieHeader || "");
-  const token = cookies["x-user-token"];
+  const cookieHeader = request.headers.get("Cookie")
+  const cookies = parse(cookieHeader || "")
+  const token = cookies["x-user-token"]
 
-  console.log(request.headers.get("x-user-token"));
-  //console.log("parsed" + cookies);
-  const formData = await request.formData();
+  // Parse the JSON data from the request
+  const data = await request.json()
 
-  // Convert formData to a plain object
-  const data = Object.fromEntries(formData);
-
-  // Make sure number fields are actually numbers
-  const parsedData = {
-    ...data,
-    price: parseFloat(data.price as string),
-    stock: parseInt(data.stock as string),
-  };
-
-  // Validate using zod schema
-  const result = productSchema.safeParse(parsedData);
+  // Validate the data against our schema
+  const result = productSchema.safeParse(data)
 
   if (!result.success) {
-    return json({ errors: result.error.flatten() }, { status: 400 });
+    return json({ errors: result.error.flatten() }, { status: 400 })
   }
 
-  // Send validated data to your backend
-  await fetchServer(request, `/api/product/add`, {
-    method: 'POST',
-    body: JSON.stringify(result.data)
+  // Send the validated data to the API
+  const response = await fetchServer(request, `/api/product/add`, {
+    method: "POST",
+    body: JSON.stringify(result.data),
+    headers: {
+      "Content-Type": "application/json",
+    },
   })
 
-  return redirect("/products");
-};
+  return redirect("/products")
+}
 
 export default function ProductDetailPage() {
-  return <ProductCreateModule />;
+  // Get the categories data from the loader
+  const data = useLoaderData<typeof loader>()
+
+  // Pass the categories to the ProductCreateModule
+  return <ProductCreateModule categories={data.categories} />
 }

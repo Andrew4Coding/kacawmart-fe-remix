@@ -2,8 +2,6 @@
 
 import { Link, useParams } from "@remix-run/react"
 import type { Product, Review } from "~/lib/types"
-//import ProductReviewsSection from "../components/product-reviews-section"
-
 
 interface ProductDetailModuleProps {
   product: Product
@@ -42,7 +40,7 @@ export default function ProductDetailModule({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold">Name</h2>
+                <h2 className="text-lg font-semibold">Product Name</h2>
                 <p className="text-gray-700">{product.name}</p>
               </div>
 
@@ -54,24 +52,24 @@ export default function ProductDetailModule({
               <div>
                 <h2 className="text-lg font-semibold">Category</h2>
                 <p className="text-gray-700">
-                  {product.category[0].name || "Uncategorized"} {/* TODO: FIX THIS */}
+                  {product.category?.name || "Uncategorized"} {/* Fixed category display */}
                 </p>
               </div>
 
               <div>
                 <h2 className="text-lg font-semibold">Price</h2>
-                <p className="text-gray-700">₹{(product.price / 100).toFixed(2)}</p>
+                <p className="text-gray-700">{(product.price / 100).toFixed(2)}</p>
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold">Stock</h2>
+                <h2 className="text-lg font-semibold">Stock Quantity</h2>
                 <p className="text-gray-700">{product.stock}</p>
               </div>
             </div>
 
             {/* Right column - Images */}
             <div>
-              <h2 className="text-lg font-semibold mb-4">Product Image</h2>
+              <h2 className="text-lg font-semibold mb-4">Product Images</h2>
               <div className="grid grid-cols-2 gap-4">
                 <img src={product.imageUrl || "/placeholder.svg"} alt="Product Image" className="rounded-lg shadow" />
               </div>
@@ -81,12 +79,12 @@ export default function ProductDetailModule({
           {/* Action buttons */}
           <div className="mt-8 flex justify-end space-x-4">
           <Link to={`/products/reviews/${id}`}>
-              <button className="border border-emerald-500 hover:bg-emerald-50 text-emerald-500 px-4 py-2 rounded">
+              <button className="border border-emerald-500 hover:bg-emerald-50 hover:text-black text-emerald-500 px-4 py-2 rounded">
                 View Reviews
               </button>
             </Link>
-            <Link to={`/products/update/${id}`}>
-              <button className="border border-emerald-500 hover:bg-emerald-50 text-emerald-500 px-4 py-2 rounded">
+            <Link to={`/products/edit/${id}`}>
+              <button className="border border-emerald-500 hover:bg-emerald-50 hover:text-black text-emerald-500 px-4 py-2 rounded">
                 Edit Details
               </button>
             </Link>
@@ -97,15 +95,6 @@ export default function ProductDetailModule({
             </Link>
           </div>
         </div>
-
-        {/* Reviews section integrated directly into the component */}
-        {/* <ProductReviewsSection
-          productId={product.id}
-          productRating={productRating}
-          ratingCount={ratingCount}
-          reviews={reviews}
-          maxReviews={3}
-        /> */}
       </div>
     </div>
   )

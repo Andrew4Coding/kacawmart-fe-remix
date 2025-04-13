@@ -1,7 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node"
 import { useLoaderData } from "@remix-run/react"
 import fetchServer from "~/lib/fetch"
-import ProductReviewsSection from "~/modules/ProductModule/components/product-reviews-section"
 import ProductDetailModule from "~/modules/ProductModule/detail"
 
 export async function loader(args: LoaderFunctionArgs) {
@@ -13,10 +12,10 @@ export async function loader(args: LoaderFunctionArgs) {
 
   // Fetch product details
   const productData = await fetchServer(args.request, `/api/product/details/${productId}`)
-  console.log("productData", productData)
+
   // Fetch reviews data
-  const reviewsData = await fetchServer(args.request, `/api/product/reviews?productId=${productId}`)
-  
+  const reviewsData = await fetchServer(args.request, `/api/product/reviews/${productId}`)
+
   return {
     product: productData.product,
     reviews: reviewsData.reviews || [],
@@ -29,8 +28,11 @@ export default function ProductPage() {
   const data = useLoaderData<typeof loader>()
 
   return (
-    <>
-      <ProductDetailModule product={data.product} />
-    </>
+    <ProductDetailModule
+      product={data.product}
+      reviews={data.reviews}
+      ratingCount={data.ratingCount}
+      productRating={data.productRating}
+    />
   )
 }
