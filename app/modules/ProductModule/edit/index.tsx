@@ -335,6 +335,7 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
                 </div>
 
                 {/* Action buttons */}
+                
                 <div className="flex justify-end gap-4 pt-4 border-t">
                   <Link to="/products">
                     <Button type="button" variant="outline" className="px-6">
