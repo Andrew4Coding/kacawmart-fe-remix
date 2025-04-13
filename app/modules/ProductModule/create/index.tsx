@@ -1,5 +1,7 @@
-
 import { Link } from "@remix-run/react";
+import { LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import fetchServer from "~/lib/fetch";
 
 import {
     Form,
@@ -11,43 +13,60 @@ import {
 } from "~/components/ui/form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 
 import { Button } from "~/components/ui/button";
 import { FileInput } from "~/components/ui/file-input";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { ProductFormValues, productSchema } from "../type";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "~/components/ui/select"
 
+type Category = {
+    id: string;
+    name: string;
+};
+
+export async function loader({ request }: LoaderFunctionArgs) {
+    try {
+        const data = await fetchServer(request, "/api/product/categories");
+        console.log("Raw categories data:", data);
+        
+        // Assume the response is directly the array of categories
+        return { categories: data };
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+        return { categories: [] };
+    }
+}
 
 export default function ProductCreateModule() {
-    const product = {
-        name: "Sample Product",
-        description: "This is a sample product description.",
-        category: "Sneaker",
-        price: 110.4,
-        stock: 211,
-        images: [
-            "https://i.pravatar.cc/300",
-            "https://i.pravatar.cc/301",
-            "https://i.pravatar.cc/302",
-            "https://i.pravatar.cc/303",
-        ],
-    }
+    const data = useLoaderData<typeof loader>();
+    
+    // Log the data to verify its structure
+    console.log("Loader data:", data);
+
+    const categories: Category[] = data || [];
 
     const form = useForm<ProductFormValues>({
         resolver: zodResolver(productSchema),
         defaultValues: {
-            name: product.name,
-            description: product.description,
-            category: product.category,
-            price: product.price,
-            stock: product.stock,
+            name: "",
+            description: "",
+            category: categories.length > 0 ? categories[0].id : "",
+            price: 0,
+            stock: 0,
+            image: null
         },
-    })
+    });
 
     const onSubmit = (data: ProductFormValues) => {
-        // In a real app, you would submit this data to your backend
         console.log("Form submitted:", data)
     }
 
@@ -55,7 +74,7 @@ export default function ProductCreateModule() {
         <div className="min-h-screen bg-[#f0faf5] p-20 pt-40">
             <div className="max-w-6xl mx-auto">
                 <div className="mb-6">
-                    <h1 className="text-3xl font-bold mb-2">Manage Product</h1>
+                    <h1 className="text-3xl font-bold mb-2">Manage</h1>
                     <div className="text-gray-600">
                         <Link to="/" className="hover:underline">
                             Home
@@ -70,9 +89,12 @@ export default function ProductCreateModule() {
                 </div>
 
                 <div className="bg-white p-8 rounded-lg shadow">
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)}>
-
+                    <FormProvider {...form}>
+                        <form 
+                            onSubmit={form.handleSubmit(onSubmit)}
+                            method="post"
+                            encType="multipart/form-data"
+                        >
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                 <div className="space-y-6">
                                     <FormField
@@ -80,9 +102,9 @@ export default function ProductCreateModule() {
                                         name="name"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Product Name</FormLabel>
+                                                <FormLabel>Name</FormLabel>
                                                 <FormControl>
-                                                    <Input {...field} />
+                                                    <Input {...field} placeholder="Insert your product name here..."/>
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -96,7 +118,7 @@ export default function ProductCreateModule() {
                                             <FormItem>
                                                 <FormLabel>Description</FormLabel>
                                                 <FormControl>
-                                                    <Textarea {...field} className="min-h-[150px]" />
+                                                    <Textarea {...field} className="min-h-[150px]" placeholder="Tell customers what makes this product special..."/>
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -108,11 +130,31 @@ export default function ProductCreateModule() {
                                         name="category"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Category</FormLabel>
+                                            <FormLabel>Category</FormLabel>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                defaultValue={field.value}
+                                            >
                                                 <FormControl>
-                                                    <Input {...field} />
+                                                <SelectTrigger className="h-10">
+                                                    <SelectValue placeholder="Select a category" />
+                                                </SelectTrigger>
                                                 </FormControl>
-                                                <FormMessage />
+                                                <SelectContent>
+                                                {categories.length === 0 ? (
+                                                    <SelectItem value="uncategorized">
+                                                        Uncategorized
+                                                    </SelectItem>
+                                                ) : (
+                                                    categories.map((cat) => (
+                                                        <SelectItem key={cat.id} value={cat.id}>
+                                                            {cat.name}
+                                                        </SelectItem>
+                                                    ))
+                                                )}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
                                             </FormItem>
                                         )}
                                     />
@@ -125,8 +167,14 @@ export default function ProductCreateModule() {
                                                 <FormLabel>Price</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
-                                                        <span className="absolute left-3 top-1/2 -translate-y-1/2">₹</span>
-                                                        <Input {...field} type="number" step="0.01" className="pl-8" />
+                                                        <span className="absolute left-3 top-1/2 -translate-y-1/2">$</span>
+                                                        <Input 
+                                                            {...field} 
+                                                            type="number" 
+                                                            step="0.01" 
+                                                            className="pl-8" 
+                                                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                                                        />
                                                     </div>
                                                 </FormControl>
                                                 <FormMessage />
@@ -139,9 +187,14 @@ export default function ProductCreateModule() {
                                         name="stock"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Stock Quantity</FormLabel>
+                                                <FormLabel>Stock</FormLabel>
                                                 <FormControl>
-                                                    <Input {...field} type="number" />
+                                                    <Input 
+                                                        {...field} 
+                                                        type="number" 
+                                                        placeholder="How many items are available?"
+                                                        onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
+                                                    />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -154,18 +207,16 @@ export default function ProductCreateModule() {
                                     <FormField
                                         control={form.control}
                                         name="image"
-                                        render={({ field: { value, onChange, ...fieldProps } }) => (
+                                        render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Profile Photo</FormLabel>
+                                                <FormLabel>Image</FormLabel>
                                                 <FormControl>
                                                     <FileInput
-                                                        file={
-                                                            form.getValues(`image`) as File | null
-                                                        }
+                                                        file={form.getValues("image") as File | null}
                                                         onFileChange={(file: File) => {
-                                                            form.setValue(`image`, file);
+                                                            form.setValue("image", file);
                                                         }}
-                                                        secondaryMessage="Upload a profile photo"
+                                                        secondaryMessage="Upload a product image"
                                                         asterisk
                                                         className="w-full"
                                                     />
@@ -177,26 +228,21 @@ export default function ProductCreateModule() {
                                 </div>
                             </div>
 
-
                             {/* Action buttons */}
                             <div className="mt-8 flex justify-end gap-4">
                                 <Button type="submit" className="bg-emerald-500 hover:bg-emerald-600">
-                                    CREATE
+                                    Create
                                 </Button>
-                                <Link
-                                    to={`/product`}
-                                >
+                                <Link to={`/product`}>
                                     <Button type="button" variant="outline">
-                                        CANCEL
+                                        Cancel
                                     </Button>
                                 </Link>
                             </div>
-
                         </form>
-                    </Form>
+                    </FormProvider>
                 </div>
             </div>
         </div>
     )
 }
-

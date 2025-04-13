@@ -24,6 +24,14 @@ export function formatDate(dateString: string): string {
   }).format(date);
 }
 
+export function formatDatee(date: Date): string {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(date)
+}
+
 export function formatPrice(price: number): string {
   // The price in the JSON seems to be in cents or smaller units
   // Dividing by 100 to convert to dollars/main currency unit
