@@ -51,7 +51,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="mt-4 border rounded-md">
           <div className="grid grid-cols-2 border-b p-2">
             <div className="text-gray-600">Sales</div>
-            <div className="text-right">{product.stock}</div>
+            <div className="text-right">{product.soldQuantity}</div>
           </div>
           <div className="grid grid-cols-2 border-b p-2">
             <div className="text-gray-600">Rating</div>
