@@ -8,12 +8,10 @@ import fetchServer from "~/lib/fetch"
 import { productSchema } from "~/modules/ProductModule/type"
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  console.log("Product create page loader called")
   try {
     // Fetch the categories data
     const response = await fetchServer(request, "/api/product/categories")
-
-    // Log the response for debugging
-    console.log("Categories API Response:", response)
 
     // Return the categories data
     return json({
@@ -33,30 +31,45 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
+  console.log("Product create action called")
+
   const cookieHeader = request.headers.get("Cookie")
   const cookies = parse(cookieHeader || "")
   const token = cookies["x-user-token"]
 
-  // Parse the JSON data from the request
-  const data = await request.json()
+  console.log("Request headers:", Object.fromEntries(request.headers.entries()))
+  console.log("Content-Type:", request.headers.get("Content-Type"))
 
-  // Validate the data against our schema
-  const result = productSchema.safeParse(data)
+  try {
+    // Parse the JSON data from the request
+    const data = await request.json()
+    console.log("Received data in action:", data)
 
-  if (!result.success) {
-    return json({ errors: result.error.flatten() }, { status: 400 })
+    // Validate the data against our schema
+    const result = productSchema.safeParse(data)
+
+    if (!result.success) {
+      console.error("Validation failed:", result.error.flatten())
+      return json({ errors: result.error.flatten() }, { status: 400 })
+    }
+
+    console.log("Validation passed, sending to API:", result.data)
+
+    // Send the validated data to the API
+    const response = await fetchServer(request, `/api/product/add`, {
+      method: "POST",
+      body: JSON.stringify(result.data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+
+    console.log("API response:", response)
+    return redirect("/products")
+  } catch (error) {
+    console.error("Error in action:", error)
+    return json({ error: String(error) }, { status: 500 })
   }
-
-  // Send the validated data to the API
-  const response = await fetchServer(request, `/api/product/add`, {
-    method: "POST",
-    body: JSON.stringify(result.data),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-
-  return redirect("/products")
 }
 
 export default function ProductDetailPage() {

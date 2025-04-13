@@ -4,7 +4,7 @@ import type React from "react"
 
 import { Link, useSubmit } from "@remix-run/react"
 import { Save, Camera } from "lucide-react"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { toast } from "~/components/ui/use-toast"
 
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form"
@@ -32,13 +32,15 @@ interface ProductCreateModuleProps {
 }
 
 export default function ProductCreateModule({ categories = [] }: ProductCreateModuleProps) {
-  console.log("Categories received in component:", categories)
+  console.log("ProductCreateModule rendered with categories:", categories)
 
   // State for product image
   const [productImage, setProductImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [debugData, setDebugData] = useState<any>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
   const submit = useSubmit()
 
   // Update the form default values to use categoryIds instead of category
@@ -54,10 +56,20 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
     },
   })
 
+  // Log form values on change for debugging
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      console.log("Form values changed:", value)
+    })
+    return () => subscription.unsubscribe()
+  }, [form])
+
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("File input changed")
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
+      console.log("File selected:", file.name, file.type, file.size)
 
       // Validate file type
       if (!file.type.startsWith("image/")) {
@@ -80,6 +92,7 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
       }
 
       setProductImage(file)
+      console.log("Product image set")
 
       // Update form value
       form.setValue("image", file)
@@ -88,6 +101,7 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
       const reader = new FileReader()
       reader.onloadend = () => {
         setImagePreview(reader.result as string)
+        console.log("Image preview set")
       }
       reader.readAsDataURL(file)
     }
@@ -95,15 +109,20 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
 
   // Trigger file input click
   const handleUploadClick = () => {
+    console.log("Upload button clicked")
     fileInputRef.current?.click()
   }
 
-  // Update the onSubmit function to use categoryIds
-  const onSubmit = async (data: ProductFormUIValues) => {
+  // Direct form submission for debugging
+  const handleDirectSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+    console.log("Direct form submission triggered")
+
     try {
       setIsSubmitting(true)
 
       if (!productImage) {
+        console.error("No product image selected")
         toast({
           title: "Image required",
           description: "Please upload a product image",
@@ -113,8 +132,103 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
         return
       }
 
+      // First upload the image to get a URL - this is the key step we were missing
+      console.log("Uploading image for debug submission...")
+      let imageUrl
+      try {
+        imageUrl = await uploadImage(productImage)
+        console.log("Debug: Image uploaded successfully, URL:", imageUrl)
+      } catch (error) {
+        console.error("Debug: Error uploading image:", error)
+        toast({
+          title: "Upload failed",
+          description: "Failed to upload product image",
+          variant: "destructive",
+        })
+        setIsSubmitting(false)
+        return
+      }
+
+      // Now prepare the data with imageUrl instead of the file
+      const productData = {
+        name: form.getValues("name"),
+        description: form.getValues("description"),
+        categoryIds: [form.getValues("categoryIds")],
+        price: Math.round(form.getValues("price") * 100),
+        stock: Number(form.getValues("stock")),
+        imageUrl: imageUrl, // Use the URL instead of the file
+      }
+
+      console.log("Debug: Prepared product data:", productData)
+
+      // Make a direct fetch request for debugging
+      const response = await fetch("/api/product/debug-create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(productData),
+      })
+
+      const result = await response.json()
+      console.log("Direct submission response:", result)
+      setDebugData(result)
+
+      toast({
+        title: "Debug info",
+        description: "Check console for submission details",
+      })
+    } catch (error) {
+      console.error("Error in direct submission:", error)
+      toast({
+        title: "Error",
+        description: "Failed to submit form. See console for details.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Update the onSubmit function to use categoryIds
+  const onSubmit = async (data: ProductFormUIValues) => {
+    console.log("Form submitted with data:", data)
+    try {
+      setIsSubmitting(true)
+      console.log("Setting isSubmitting to true")
+
+      if (!productImage) {
+        console.error("No product image selected")
+        toast({
+          title: "Image required",
+          description: "Please upload a product image",
+          variant: "destructive",
+        })
+        setIsSubmitting(false)
+        return
+      }
+
+      console.log("Uploading image...")
       // First upload the image
-      const imageUrl = await uploadImage(productImage)
+      let imageUrl
+      try {
+        imageUrl = await uploadImage(productImage)
+        console.log("Image uploaded successfully, URL:", imageUrl)
+
+        toast({
+          title: "Image uploaded",
+          description: "Image uploaded successfully",
+        })
+      } catch (error) {
+        console.error("Error uploading image:", error)
+        toast({
+          title: "Upload failed",
+          description: "Failed to upload product image. Please try again.",
+          variant: "destructive",
+        })
+        setIsSubmitting(false)
+        return
+      }
 
       // Then prepare the data for the backend
       const productData = {
@@ -123,11 +237,19 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
         categoryIds: [data.categoryIds], // Convert single categoryIds to array
         price: Math.round(data.price * 100), // Convert to cents
         stock: data.stock,
-        imageUrl: imageUrl,
+        imageUrl: imageUrl, // Use the URL instead of the file
       }
+
+      console.log("Submitting product data to backend:", productData)
 
       // Submit the data
       submit(productData, { method: "post", encType: "application/json" })
+      console.log("submit() function called")
+
+      toast({
+        title: "Creating product",
+        description: "Your product is being created...",
+      })
     } catch (error) {
       console.error("Error creating product:", error)
       toast({
@@ -163,7 +285,7 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
           </CardHeader>
           <CardContent className="p-6">
             <RHFFormProvider {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   {/* Left column - Main product info */}
                   <div className="lg:col-span-2 space-y-6">
@@ -345,11 +467,31 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
                     <Save className="mr-2 h-4 w-4" />
                     {isSubmitting ? "Creating..." : "Create Product"}
                   </Button>
+
+                  {/* Debug button - direct submission */}
+                  <Button
+                    type="button"
+                    onClick={handleDirectSubmit}
+                    className="bg-blue-500 hover:bg-blue-600 px-6"
+                    disabled={isSubmitting}
+                  >
+                    Debug Submit
+                  </Button>
                 </div>
               </form>
             </RHFFormProvider>
           </CardContent>
         </Card>
+
+        {/* Debug information display */}
+        {debugData && (
+          <div className="mt-8 bg-white p-4 rounded-lg shadow-sm">
+            <h3 className="font-semibold mb-2">Debug Information</h3>
+            <pre className="bg-gray-100 p-4 rounded text-xs overflow-auto max-h-96">
+              {JSON.stringify(debugData, null, 2)}
+            </pre>
+          </div>
+        )}
       </div>
     </div>
   )

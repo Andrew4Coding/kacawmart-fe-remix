@@ -1,51 +1,61 @@
 import { type ActionFunctionArgs, json } from "@remix-run/node"
-import { parse } from "cookie"
+import fetchServer from "~/lib/fetch"
 
-export async function action({ request }: ActionFunctionArgs) {
-  // Check if the request is a POST request
+export const action = async ({ request }: ActionFunctionArgs) => {
+  console.log("Upload endpoint called")
+
   if (request.method !== "POST") {
     return json({ error: "Method not allowed" }, { status: 405 })
   }
 
   try {
-    // Get the form data from the request
     const formData = await request.formData()
     const file = formData.get("file") as File
+    const key = formData.get("key") as string | null
 
     if (!file) {
       return json({ error: "No file provided" }, { status: 400 })
     }
 
-    // Get authentication token from cookies
-    const cookieHeader = request.headers.get("Cookie")
-    const cookies = parse(cookieHeader || "")
-    const token = cookies["x-user-token"]
+    // Forward to the working /upload endpoint using fetchServer
+    const forwardFormData = new FormData()
+    forwardFormData.append("upload", file)
+    if (key) forwardFormData.append("key", key)
 
-    // Create a new FormData to send to your backend
-    const uploadFormData = new FormData()
-    uploadFormData.append("file", file)
+    console.log("Forwarding to /upload via fetchServer")
 
-    // Send the file to your backend upload endpoint
-    const uploadResponse = await fetch(`${process.env.API_URL}/api/upload`, {
+    const uploadResponse = await fetchServer(request, "/upload", {
       method: "POST",
-      body: uploadFormData,
+      body: forwardFormData,
       headers: {
-        Authorization: `Bearer ${token}`,
+        // No need to set Content-Type for FormData
       },
     })
 
     if (!uploadResponse.ok) {
-      const errorData = await uploadResponse.json()
-      return json({ error: errorData.message || "Upload failed" }, { status: uploadResponse.status })
+      const errorText = await uploadResponse.text()
+      console.error("Upload failed:", errorText)
+      throw new Error(`Upload failed: ${errorText}`)
     }
 
-    // Get the response from the backend
-    const uploadResult = await uploadResponse.json()
+    const data = await uploadResponse.json()
 
-    // Return the image URL
-    return json({ imageUrl: uploadResult.url })
+    if (!data.url && !data.imageUrl) {
+      console.error("Upload succeeded but missing URL")
+      throw new Error("Upload succeeded but no URL returned")
+    }
+
+    return json({
+      imageUrl: data.url || data.imageUrl,
+      url: data.url || data.imageUrl,
+      success: true,
+    })
   } catch (error) {
     console.error("Error uploading file:", error)
-    return json({ error: "Failed to upload file" }, { status: 500 })
+    return json({ error: String(error), success: false }, { status: 500 })
   }
+}
+
+export const loader = async () => {
+  return json({ message: "Upload endpoint is working" })
 }

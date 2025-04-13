@@ -1,7 +1,9 @@
-import { Link } from "@remix-run/react"
+import { Link, useFetcher } from "@remix-run/react"
 import { ArrowLeft, Truck, Package, Calendar, CreditCard } from "lucide-react"
+import { useState, useEffect } from "react"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
+import { toast } from "~/components/ui/use-toast"
 import { formatCurrency, formatDatee } from "~/lib/utils"
 
 interface OrderProduct {
@@ -38,6 +40,9 @@ interface OrderDetailProps {
 }
 
 export default function OrderDetailModule({ order }: OrderDetailProps) {
+  const fetcher = useFetcher()
+  const [isUpdating, setIsUpdating] = useState(false)
+
   // Get status color based on delivery status
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -49,10 +54,72 @@ export default function OrderDetailModule({ order }: OrderDetailProps) {
         return "bg-blue-100 text-blue-800"
       case "CANCELLED":
         return "bg-red-100 text-red-800"
+      case "ON_DELIVERY":
+        return "bg-blue-100 text-blue-800"
       default:
         return "bg-gray-100 text-gray-800"
     }
   }
+
+  // Handle update delivery status
+  const handleUpdateDeliveryStatus = () => {
+    console.log("Updating delivery status for order:", order.id)
+    setIsUpdating(true)
+    
+    fetcher.submit(
+      {},
+      { method: "patch", action: `/api/seller/orders/${order.id}/confirm` }
+    )
+  }
+
+  // Get button text based on current status
+  const getButtonText = () => {
+    if (isUpdating) return "Updating..."
+    
+    switch (order.deliveryStatus) {
+      case "PENDING":
+        return "Mark as On Delivery"
+      case "ON_DELIVERY":
+        return "Mark as Delivered"
+      case "DELIVERED":
+        return "Already Delivered"
+      default:
+        return "Update Status"
+    }
+  }
+
+  // Define TypeScript interface for fetcher data
+  interface FetcherData {
+    error?: string;
+    success?: boolean;
+    updated?: any;
+  }
+  
+  // Listen for completion of the fetch request
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data) {
+      setIsUpdating(false)
+      
+      // Type cast the data to our interface
+      const responseData = fetcher.data as FetcherData;
+      
+      if (responseData.error) {
+        toast({
+          title: "Error",
+          description: responseData.error,
+          variant: "destructive",
+        })
+      } else {
+        toast({
+          title: "Success",
+          description: "Order status updated successfully",
+        })
+        
+        // Reload the page to show updated data
+        window.location.reload()
+      }
+    }
+  }, [fetcher.state, fetcher.data])
 
   return (
     <div className="min-h-screen bg-[#f0faf5] p-20 pt-40">
@@ -170,17 +237,26 @@ export default function OrderDetailModule({ order }: OrderDetailProps) {
                     </span>
                   </div>
                 </div>
+
+                {/* Remove the Update Delivery Status Button we added before */}
               </div>
             </div>
           </div>
         </div>
 
         <div className="flex justify-end space-x-4">
-          <Link to={`/orders/${order.id}/edit`}>
-            <Button variant="outline" className="border-emerald-500 text-emerald-500 hover:bg-emerald-50">
-              Update Order
-            </Button>
-          </Link>
+          <Button 
+            variant="outline" 
+            className="border-emerald-500 text-emerald-500 hover:bg-emerald-50"
+            onClick={handleUpdateDeliveryStatus}
+            disabled={isUpdating || order.deliveryStatus === "DELIVERED"}
+          >
+            {isUpdating ? "Updating..." : 
+              order.deliveryStatus === "DELIVERED" ? "Order Delivered" : 
+              order.deliveryStatus === "PENDING" ? "Mark as On Delivery" : 
+              "Mark as Delivered"
+            }
+          </Button>
           <Link to="/orders">
             <Button className="bg-emerald-500 hover:bg-emerald-600">
               <ArrowLeft className="mr-2 h-4 w-4" /> Back to Orders

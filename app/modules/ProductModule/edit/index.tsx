@@ -117,7 +117,22 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
 
       // If a new image was uploaded, process it
       if (productImage) {
-        imageUrl = await uploadImage(productImage)
+        try {
+          imageUrl = await uploadImage(productImage)
+          toast({
+            title: "Image uploaded",
+            description: "Image uploaded successfully",
+          })
+        } catch (error) {
+          console.error("Error uploading image:", error)
+          toast({
+            title: "Upload failed",
+            description: "Failed to upload product image. Please try again.",
+            variant: "destructive",
+          })
+          setIsSubmitting(false)
+          return
+        }
       }
 
       const productData = {
@@ -131,6 +146,11 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
 
       // Submit the data
       submit(productData, { method: "post", encType: "application/json" })
+
+      toast({
+        title: "Updating product",
+        description: "Your product is being updated...",
+      })
     } catch (error) {
       console.error("Error updating product:", error)
       toast({
@@ -335,7 +355,6 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
                 </div>
 
                 {/* Action buttons */}
-                
                 <div className="flex justify-end gap-4 pt-4 border-t">
                   <Link to="/products">
                     <Button type="button" variant="outline" className="px-6">
