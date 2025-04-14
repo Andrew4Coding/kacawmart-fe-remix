@@ -37,9 +37,11 @@ interface Seller {
 
 interface Review {
   id: string
+  title: string
+  content: string
   rating: number
-  comment: string
-  // Add other review fields as needed
+  customerId: string
+  productId: string
 }
 
 interface Product {
@@ -84,11 +86,52 @@ export default function ProductDetailPage() {
     message: string
   } | null>(null)
 
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [loadingReviews, setLoadingReviews] = useState(false)
+
   useEffect(() => {
     if (productId) {
       fetchProductDetails()
     }
   }, [productId])
+
+  // Add this after the existing useEffect
+  useEffect(() => {
+    if (productId) {
+      fetchReviews()
+    }
+  }, [productId])
+
+  const fetchReviews = async () => {
+    try {
+      setLoadingReviews(true)
+      const response = await fetch(`/api/review/product/${productId}`)
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch reviews")
+      }
+
+      const data = await response.json()
+      console.log("Raw reviews data:", data)
+
+      // Convert the object to an array if it's not already one
+      let reviewsArray: Review[] = []
+
+      if (Array.isArray(data)) {
+        reviewsArray = data
+      } else if (typeof data === "object" && data !== null) {
+        // If it's an object with numeric keys, convert to array
+        reviewsArray = Object.values(data)
+      }
+
+      console.log("Processed reviews array:", reviewsArray)
+      setReviews(reviewsArray)
+    } catch (err) {
+      console.error("Error fetching reviews:", err)
+    } finally {
+      setLoadingReviews(false)
+    }
+  }
 
   const fetchProductDetails = async () => {
     try {
@@ -211,7 +254,10 @@ export default function ProductDetailPage() {
         <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-sm">
           <div className="text-center py-12">
             <div className="text-red-500 mb-4 text-lg">{error || "Product not found"}</div>
-            <Button onClick={() => navigate(`/api/explore/product/${productId}/explore`)} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button
+              onClick={() => navigate(`/api/explore/product/${productId}/explore`)}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
               Back to Explore
             </Button>
           </div>
@@ -403,9 +449,14 @@ export default function ProductDetailPage() {
               </TabsContent>
               <TabsContent value="reviews" className="space-y-4">
                 <h3 className="text-lg font-semibold mb-2">Customer Reviews</h3>
-                {product.Review && product.Review.length > 0 ? (
+                {loadingReviews ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto"></div>
+                    <p className="mt-2 text-gray-500">Loading reviews...</p>
+                  </div>
+                ) : reviews && reviews.length > 0 ? (
                   <div className="space-y-4">
-                    {product.Review.map((review) => (
+                    {reviews.map((review) => (
                       <div key={review.id} className="bg-gray-50 p-4 rounded-lg">
                         <div className="flex items-center mb-2">
                           <div className="flex">
@@ -420,7 +471,8 @@ export default function ProductDetailPage() {
                           </div>
                           <span className="ml-2 text-sm text-gray-500">Verified Purchase</span>
                         </div>
-                        <p className="text-gray-700">{review.comment}</p>
+                        <h4 className="font-medium text-gray-900 mb-1">{review.title}</h4>
+                        <p className="text-gray-700">{review.content}</p>
                       </div>
                     ))}
                   </div>
