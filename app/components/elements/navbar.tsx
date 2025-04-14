@@ -1,5 +1,5 @@
 import { Link, useLoaderData, useLocation } from "@remix-run/react"
-import { ChevronDown, Heart, Home, LogIn, LogOut, Menu, Package, Receipt, ShoppingBag, ShoppingBasket, ShoppingCart, User, X } from "lucide-react"
+import { ChevronDown, Heart, Home, LogIn, LogOut, Menu, Package, Receipt, ShoppingBag, ShoppingBasket, ShoppingCart, User, Wallet, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Button } from "~/components/ui/button"
@@ -27,6 +27,7 @@ const navbarNavigationData: NavbarNavigationProps[] = [
   { name: "My Transactions", path: "/transaction", icon: <Receipt className="h-4 w-4" /> },
   { name: "Wishlist", path: "/wishlist", icon: <Heart className="h-4 w-4" /> },
   { name: "Cart", path: "/cart", icon: <ShoppingCart className="h-4 w-4" /> },
+  { name: "Kacaw Pay", path: "/kacawpay", icon: <Wallet className="h-4 w-4" /> },
 ]
 
 const NavbarNavigation: React.FC<NavbarNavigationProps> = ({ name, path, icon, role }) => {

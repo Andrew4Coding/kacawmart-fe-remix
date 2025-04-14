@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
+import { Button } from "~/components/ui/button";
 
 export const loader = async () => {
   return { balance: 100000, vouchers: ["Voucher A", "Voucher B"] };
@@ -45,15 +46,22 @@ export default function KacawPayDashboard() {
 
         {/* Buttons */}
         <div className="mt-6 flex flex-col gap-3">
-          <button
-            className="w-full bg-[#009579] text-white py-2 rounded-lg shadow-md hover:bg-[#007a60] transition"
+          <Button
             onClick={() => setIsTopUpOpen(true)}
           >
-            🔼 Top Up
-          </button>
-          <button className="w-full border border-[#009579] text-[#009579] py-2 rounded-lg shadow-md hover:bg-[#009579] hover:text-white transition">
-            📜 Cek History Transaksi
-          </button>
+            Top Up
+          </Button>
+          <Link
+            to={'/transaction'}
+            className="w-full"
+          >
+            <Button
+              variant={'outline'}
+              className="w-full"
+            >
+              Cek History Transaksi
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -82,21 +90,20 @@ export default function KacawPayDashboard() {
             />
 
             <div className="mt-4 flex justify-between">
-              <button
-                className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500"
+              <Button
+                variant={'destructive'}
                 onClick={() => setIsTopUpOpen(false)}
               >
                 Batal
-              </button>
-              <button
-                className="bg-[#009579] text-white px-4 py-2 rounded-md hover:bg-[#007a60]"
+              </Button>
+              <Button
                 onClick={() => {
                   console.log("Top Up:", topUpAmount, "Bukti:", file);
                   setIsTopUpOpen(false);
                 }}
               >
                 Konfirmasi
-              </button>
+              </Button>
             </div>
           </div>
         </div>
