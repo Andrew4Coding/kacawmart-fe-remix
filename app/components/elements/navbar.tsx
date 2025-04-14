@@ -1,5 +1,5 @@
 import { Link, useLoaderData, useLocation } from "@remix-run/react"
-import { ChevronDown, Home, LogIn, LogOut, Menu, Package, Receipt, ShoppingBag, ShoppingBasket, ShoppingCart, User, X } from "lucide-react"
+import { ChevronDown, Heart, Home, LogIn, LogOut, Menu, Package, Receipt, ShoppingBag, ShoppingBasket, ShoppingCart, User, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Button } from "~/components/ui/button"
