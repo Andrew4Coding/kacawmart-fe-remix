@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react"
-import { Trash2, ShoppingCart, AlertCircle, Heart, MoveRight } from "lucide-react"
+import { Link, useLoaderData } from "@remix-run/react"
+import { AlertCircle, ArrowRight, Heart, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { Alert, AlertDescription } from "~/components/ui/alert"
+import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardFooter } from "~/components/ui/card"
-import { Badge } from "~/components/ui/badge"
 import { Separator } from "~/components/ui/separator"
-import { Alert, AlertDescription } from "~/components/ui/alert"
-import { toast } from "sonner"
-import { Link, useLoaderData } from "@remix-run/react"
 
 interface Product {
   id: string
@@ -216,11 +216,7 @@ export default function WishlistModule() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {wishlistItems.map((item) => (
-                  <Card key={item.id} className="overflow-hidden"
-                    onClick={() => {
-                      window.location.href = `/explore/product/${item.id}`
-                    }}
-                  >
+                  <Card key={item.id} className="overflow-hidden" >
                     <div className="h-48 bg-gray-100">
                       <img
                         src={item.imageUrl || "/placeholder.svg?height=192&width=384"}
@@ -242,6 +238,16 @@ export default function WishlistModule() {
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Remove
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          window.location.href = `/explore/product/${item.id}`
+                        }}
+                        disabled={isUpdating}
+                        className="w-full"
+                      >
+                        <ArrowRight className="h-4 w-4 mr-2" />
+                        See Details
                       </Button>
                     </CardFooter>
                   </Card>
