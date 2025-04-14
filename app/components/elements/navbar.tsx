@@ -1,5 +1,5 @@
 import { Link, useLoaderData, useLocation } from "@remix-run/react"
-import { ChevronDown, Home, LogIn, LogOut, Menu, Package, Receipt, ShoppingBag, ShoppingBasket, ShoppingCart, User, X } from "lucide-react"
+import { ChevronDown, Heart, Home, LogIn, LogOut, Menu, Package, Receipt, ShoppingBag, ShoppingBasket, ShoppingCart, User, Wallet, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Button } from "~/components/ui/button"
@@ -21,11 +21,13 @@ interface NavbarNavigationProps {
 }
 
 const navbarNavigationData: NavbarNavigationProps[] = [
-  { name: "Home", path: "/", icon: <Home className="h-4 w-4" />, role: 'customer' },
   { name: "Explore", path: "/explore", icon: <Package className="h-4 w-4" />, role: 'customer' },
-  { name: "My Products", path: "/products", icon: <ShoppingBasket className="h-4 w-4" />, role: 'seller' },
-  { name: "My Transactions", path: "/transaction", icon: <Receipt className="h-4 w-4" /> },
-  { name: "My Cart", path: "/cart", icon: <ShoppingCart className="h-4 w-4" /> },
+  { name: "My Products", path: "/products", icon: <Package className="h-4 w-4" />, role: 'seller' },
+  { name: "My Orders", path: "/orders", icon: <ShoppingCart className="h-4 w-4" />, role: 'seller' },
+  { name: "My Transactions", path: "/transaction", icon: <Receipt className="h-4 w-4" />,role: 'customer' },
+  { name: "My Cart", path: "/cart", icon: <ShoppingCart className="h-4 w-4" />, role: 'customer' },
+  { name: "Wishlist", path: "/wishlist", icon: <Heart className="h-4 w-4" />, role: 'customer' },
+  { name: "KACAWpay", path: "/wallet", icon: <Wallet className="h-4 w-4" />, role: 'customer' } 
 ]
 
 const NavbarNavigation: React.FC<NavbarNavigationProps> = ({ name, path, icon, role }) => {
