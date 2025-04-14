@@ -1,6 +1,6 @@
-import KacawPayModule from "~/modules/KacawPayModule";
-import { loader } from "~/modules/KacawPayModule/loader";
-import { topUpAction, buyVoucherAction } from "~/modules/KacawPayModule/actions";
+import KacawPayModule from "~/modules/WallertPageModule";
+import { loader } from "~/modules/WallertPageModule/loader";
+import { topUpAction, buyVoucherAction } from "~/modules/WallertPageModule/actions";
 
 export { loader };
 
