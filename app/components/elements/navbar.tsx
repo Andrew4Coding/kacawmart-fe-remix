@@ -26,7 +26,7 @@ interface NavbarNavigationProps {
 
 const navbarNavigationData: NavbarNavigationProps[] = [
   { name: "Home", path: "/", icon: <Home className="h-4 w-4" /> },
-  { name: "Products", path: "/explore", icon: <Package className="h-4 w-4" /> },
+  { name: "Explore", path: "/explore", icon: <Package className="h-4 w-4" /> },
   { name: "My Transactions", path: "/transaction", icon: <Receipt className="h-4 w-4" /> },
   { name: "My Cart", path: "/cart", icon: <ShoppingCart className="h-4 w-4" /> },
 ]

@@ -7,6 +7,7 @@ import { Separator } from "~/components/ui/separator"
 import { Alert, AlertDescription } from "~/components/ui/alert"
 import { toast } from "sonner"
 import { Link } from "@remix-run/react"
+import Image from "~/components/ui/image"
 
 interface Product {
   id: string
@@ -193,8 +194,8 @@ export default function CartModule() {
                   <Card key={item.id} className="overflow-hidden">
                     <CardContent className="p-0">
                       <div className="flex flex-col sm:flex-row">
-                        <div className="w-full sm:w-32 h-32 bg-gray-100">
-                          <img
+                        <div className="w-full sm:w-32 h-full bg-gray-100">
+                          <Image
                             src={item.product.imageUrl || "/placeholder.svg?height=128&width=128"}
                             alt={item.product.name}
                             className="w-full h-full object-cover"
@@ -273,11 +274,11 @@ export default function CartModule() {
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter className="p-6 pt-0">
+                  <CardFooter className="p-6 flex gap-4 items-center">
                     <Link to="/checkout" className="w-full">
                       <Button className="w-full bg-emerald-600 hover:bg-emerald-700">Proceed to Checkout</Button>
                     </Link>
-                    <Link to="/explore" className="w-full mt-2">
+                    <Link to="/explore" className="w-full">
                       <Button
                         variant="outline"
                         className="w-full border-emerald-600 text-emerald-600 hover:bg-emerald-50"

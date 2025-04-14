@@ -12,8 +12,16 @@ export default async function fetchServer(req: Request, url: string, options?: R
         },
         credentials: 'include',
     });
-    const data = await response.json();
-
-
-    return data;
+    try {
+        const data = await response.json();
+    
+        return data;
+    }
+    catch (error) {
+        console.error('Error parsing JSON:', error);
+        return {
+            error: 'Error parsing JSON response',
+            status: response.status,
+        }
+    }
 }
