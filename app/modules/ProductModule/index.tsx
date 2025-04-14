@@ -22,18 +22,6 @@ export default function ProductModule({ products }: { products: Product[] }) {
       <div className="flex justify-between items-center">
         <h1 className="font-libre font-bold text-2xl">All Products</h1>
         <div className="flex items-center space-x-4">
-          <Select>
-          <SelectTrigger className="w-[180px] bg-white border-emerald-500 text-emerald-800 hover:bg-emerald-50">
-            <SelectValue placeholder="Sort By" className="text-emerald-700" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border-emerald-100 shadow-lg">
-              <SelectItem value="newest">Newest</SelectItem>
-              <SelectItem value="price-low">Price: Low to High</SelectItem>
-              <SelectItem value="price-high">Price: High to Low</SelectItem>
-              <SelectItem value="rating">Highest Rating</SelectItem>
-            </SelectContent>
-          </Select>
-          
           <Link to={"/products/create"}>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
