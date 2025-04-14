@@ -33,7 +33,10 @@ export async function loader(args: LoaderFunctionArgs) {
         }
     }
 
-    return session.data?.user ?? null;
+    return {
+        ...session.data?.user,
+        authUrl: process.env.AUTH_URL,
+    };
 }
 
 export default function PageLayout() {
