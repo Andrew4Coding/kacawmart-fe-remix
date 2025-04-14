@@ -1,6 +1,8 @@
-import { LoaderFunctionArgs } from "@remix-run/node";
-import { useEffect } from "react";
-import ProfileModule from "~/modules/ProfileModule";
+// import { json, LoaderFunctionArgs, ActionFunctionArgs, redirect } from "@remix-run/node"; 
+// import { useLoaderData, useActionData, useNavigation, Form as RemixForm, useSubmit } from "@remix-run/react";
+// import { format } from "date-fns";
+
+// import ProfileModule from "~/modules/ProfileModule";
 
 export async function loader(args: LoaderFunctionArgs) {
     const response = await fetch(`${process.env.AUTH_URL}/user/profile`, {
