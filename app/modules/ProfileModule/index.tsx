@@ -289,10 +289,14 @@ export default function ProfileModule() {
                         </CardContent>
 
                         <CardFooter className="border-t pt-6 flex justify-center">
-                            <Button variant="outline" className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600">
-                                <LogOut className="h-4 w-4 mr-2" />
-                                Sign Out
-                            </Button>
+                            <Link
+                                to="/logout"
+                            >
+                                <Button variant="outline" className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600">
+                                    <LogOut className="h-4 w-4 mr-2" />
+                                    Sign Out
+                                </Button>
+                            </Link>
                         </CardFooter>
                     </Card>
                 </div>

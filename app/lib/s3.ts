@@ -81,7 +81,7 @@ export const s3GetAllKeys = async () => {
     });
 };
 
-export const uploadFileToS3 = async (file: File, key?: string, folder?: string) => {
+export const uploadFileToS3Server = async (file: File, key?: string, folder?: string) => {
     const Body = Buffer.from(await file.arrayBuffer());
 
     const folderName = (folder || '').replace(/^\/|\/$/g, '') + '/';

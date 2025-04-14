@@ -1,5 +1,5 @@
 import { Link, useLoaderData, useLocation } from "@remix-run/react"
-import { ChevronDown, Home, LogIn, LogOut, Menu, Package, Receipt, ShoppingBag, ShoppingCart, User, X } from "lucide-react"
+import { ChevronDown, Home, LogIn, LogOut, Menu, Package, Receipt, ShoppingBag, ShoppingBasket, ShoppingCart, User, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Button } from "~/components/ui/button"
@@ -22,16 +22,18 @@ interface NavbarNavigationProps {
   name: string;
   path: string;
   icon: React.ReactNode;
+  role?: 'customer' | 'seller' | 'admin';
 }
 
 const navbarNavigationData: NavbarNavigationProps[] = [
-  { name: "Home", path: "/", icon: <Home className="h-4 w-4" /> },
-  { name: "Products", path: "/explore", icon: <Package className="h-4 w-4" /> },
+  { name: "Home", path: "/", icon: <Home className="h-4 w-4" />, role: 'customer' },
+  { name: "Explore", path: "/explore", icon: <Package className="h-4 w-4" />, role: 'customer' },
+  { name: "My Products", path: "/products", icon: <ShoppingBasket className="h-4 w-4" />, role: 'seller' },
   { name: "My Transactions", path: "/transaction", icon: <Receipt className="h-4 w-4" /> },
   { name: "My Cart", path: "/cart", icon: <ShoppingCart className="h-4 w-4" /> },
 ]
 
-const NavbarNavigation: React.FC<NavbarNavigationProps> = ({ name, path, icon }) => {
+const NavbarNavigation: React.FC<NavbarNavigationProps> = ({ name, path, icon, role }) => {
   const location = useLocation()
   const isActive = location.pathname === path
 
@@ -50,7 +52,11 @@ const NavbarNavigation: React.FC<NavbarNavigationProps> = ({ name, path, icon })
 }
 
 export default function Navbar() {
-  const data: SessionData | undefined = useLoaderData()
+  const data: {
+    name: string;
+    role: string;
+    email: string;
+  } = useLoaderData()
   const location = useLocation()
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -64,6 +70,13 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  const filteredNavbarData = navbarNavigationData.filter((item) => { 
+    if (!data) return false
+    if (item.role === 'customer' && data.role !== 'customer') return false
+    if (item.role === 'seller' && data.role !== 'seller') return false
+    return true
+  })
 
   // Get user initials for avatar
   const getInitials = (name: string) => {
@@ -99,9 +112,11 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-1">
-          {navbarNavigationData.map((item) => (
-            <NavbarNavigation key={item.path} {...item} />
-          ))}
+          {filteredNavbarData.map((item) => {
+            return (
+              <NavbarNavigation key={item.path} {...item} />
+            )
+          })}
         </div>
 
         {/* User Account Section */}
@@ -186,30 +201,12 @@ export default function Navbar() {
               </div>
             </div>
           )}
-
-          <Link
-            to="/"
-            className={cn(
-              "flex items-center space-x-3 p-4 rounded-md transition-colors",
-              isActive("/") ? "bg-emerald-100 text-emerald-700" : "hover:bg-gray-100",
-            )}
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            <Home className="h-5 w-5" />
-            <span className="font-medium">Home</span>
-          </Link>
-
-          <Link
-            to="/transaction"
-            className={cn(
-              "flex items-center space-x-3 p-4 rounded-md transition-colors",
-              isActive("/transaction") ? "bg-emerald-100 text-emerald-700" : "hover:bg-gray-100",
-            )}
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            <Receipt className="h-5 w-5" />
-            <span className="font-medium">My Transactions</span>
-          </Link>
+          
+          {filteredNavbarData.map((item) => {
+            return (
+              <NavbarNavigation key={item.path} {...item} />
+            )
+          })}
 
           <div className="pt-4 mt-4 border-t border-gray-200">
             {data ? (

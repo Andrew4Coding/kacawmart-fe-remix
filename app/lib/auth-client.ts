@@ -11,3 +11,18 @@ export const getServerAuthClient = () => {
         ]
     });
 };
+
+
+export const getUserFromRequest = async (request: Request) => {
+    const authClient = getServerAuthClient();
+
+    const session = await authClient.getSession({
+        fetchOptions: {
+            headers: {
+                Cookie: request.headers.get('Cookie') || '',
+            }
+        }
+    });
+
+    return session?.data?.user;
+}

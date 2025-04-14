@@ -32,18 +32,5 @@ export async function loader(args: LoaderFunctionArgs) {
 }
 
 export default function Index() {
-    useEffect(() => {
-        fetch("/api/healthcheck").then((res) => {
-            if (res.status !== 200) {
-                throw new Error("Healthcheck failed");
-            }
-        }
-        ).catch((err) => {
-            console.error(err);
-        }
-        );
-    }, [])
-    return <ProfileModule
-        
-    />;
+    return <ProfileModule />;
 }

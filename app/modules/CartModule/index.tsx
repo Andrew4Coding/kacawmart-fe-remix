@@ -1,34 +1,14 @@
-import { useState, useEffect } from "react"
-import { Trash2, MinusCircle, PlusCircle, ShoppingCart, AlertCircle } from "lucide-react"
+import { Link, useLoaderData } from "@remix-run/react"
+import { AlertCircle, MinusCircle, PlusCircle, ShoppingCart, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { Alert, AlertDescription } from "~/components/ui/alert"
+import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardFooter } from "~/components/ui/card"
-import { Badge } from "~/components/ui/badge"
+import Image from "~/components/ui/image"
 import { Separator } from "~/components/ui/separator"
-import { Alert, AlertDescription } from "~/components/ui/alert"
-import { toast } from "sonner"
-import { Link } from "@remix-run/react"
-
-interface Product {
-  id: string
-  name: string
-  price: number
-  imageUrl: string
-  stock: number
-}
-
-interface CartProduct {
-  id: string
-  amount: number
-  price: number
-  productId: string
-  product: Product
-}
-
-interface CartResponse {
-  success: boolean
-  message?: string
-  products: CartProduct[]
-}
+import { CartProduct } from "./types"
 
 // Format price to IDR
 const formatPrice = (price: number) => {
@@ -46,33 +26,16 @@ export default function CartModule() {
   const [error, setError] = useState<string | null>(null)
   const [isUpdating, setIsUpdating] = useState(false)
 
+  const loaderData: CartProduct[] = useLoaderData();
+
   useEffect(() => {
-    fetchCart()
-  }, [])
-
-  const fetchCart = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch("/api/cart")
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch cart")
-      }
-
-      const data: CartResponse = await response.json()
-
-      if (data.success) {
-        setCartItems(data.products || [])
-      } else {
-        setError(data.message || "Failed to load cart")
-      }
-    } catch (err) {
-      setError("Failed to load cart. Please try again later.")
-      console.error("Error fetching cart:", err)
-    } finally {
-      setLoading(false)
+    if (loaderData) {
+      setCartItems(loaderData)
+    } else {
+      setError("Failed to load cart items.")
     }
-  }
+    setLoading(false)
+  }, [loaderData])
 
   const updateQuantity = async (productQuantityId: string, quantity: number) => {
     if (quantity < 1) return
@@ -193,8 +156,8 @@ export default function CartModule() {
                   <Card key={item.id} className="overflow-hidden">
                     <CardContent className="p-0">
                       <div className="flex flex-col sm:flex-row">
-                        <div className="w-full sm:w-32 h-32 bg-gray-100">
-                          <img
+                        <div className="w-full sm:w-32 h-full bg-gray-100">
+                          <Image
                             src={item.product.imageUrl || "/placeholder.svg?height=128&width=128"}
                             alt={item.product.name}
                             className="w-full h-full object-cover"
@@ -273,11 +236,11 @@ export default function CartModule() {
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter className="p-6 pt-0">
+                  <CardFooter className="p-6 flex gap-4 items-center">
                     <Link to="/checkout" className="w-full">
                       <Button className="w-full bg-emerald-600 hover:bg-emerald-700">Proceed to Checkout</Button>
                     </Link>
-                    <Link to="/explore" className="w-full mt-2">
+                    <Link to="/explore" className="w-full">
                       <Button
                         variant="outline"
                         className="w-full border-emerald-600 text-emerald-600 hover:bg-emerald-50"

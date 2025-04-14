@@ -15,6 +15,7 @@ import {
 } from "~/components/ui/dialog"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Link } from "@remix-run/react"
+import Image from "~/components/ui/image"
 
 // Types based on the API response
 interface Category {
@@ -264,7 +265,7 @@ export default function ProductDetailPage() {
             {/* Product Image */}
             <div className="relative">
               <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
-                <img
+                <Image
                   src={product.imageUrl || "/placeholder.svg"}
                   alt={product.name}
                   className="w-full h-full object-contain"
