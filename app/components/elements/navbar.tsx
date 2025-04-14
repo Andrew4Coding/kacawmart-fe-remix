@@ -27,7 +27,6 @@ const navbarNavigationData: NavbarNavigationProps[] = [
   { name: "My Transactions", path: "/transaction", icon: <Receipt className="h-4 w-4" /> },
   { name: "Wishlist", path: "/wishlist", icon: <Heart className="h-4 w-4" /> },
   { name: "Cart", path: "/cart", icon: <ShoppingCart className="h-4 w-4" /> },
-  { name: "Profile", path: "/profile", icon: <User className="h-4 w-4" /> },
 ]
 
 const NavbarNavigation: React.FC<NavbarNavigationProps> = ({ name, path, icon, role }) => {
