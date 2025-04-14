@@ -18,14 +18,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
     // Extract categoryId from URL search params
     const categoryId = url.searchParams.get("categoryId")
+    
+    // Get status from URL search params (optional)
+    const status = url.searchParams.get("status") || "all"
 
     // Log what we're trying to fetch
     console.log(`Fetching products with categoryId: ${categoryId || "none"}`)
 
-    // Use the correct endpoints as specified
+    // Use the new endpoints based on our updated API design
     const productsUrl = categoryId
-      ? `/api/product/filter/${categoryId}` // Products by category
-      : "/api/product/all" // All products
+      ? `/api/product/products/category/${categoryId}` // Products by category
+      : `/api/product/products` // All products
 
     console.log(`API URL: ${productsUrl}`)
 
