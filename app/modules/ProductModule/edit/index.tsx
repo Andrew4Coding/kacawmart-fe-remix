@@ -43,11 +43,14 @@ interface ProductEditModuleProps {
 }
 
 export default function ProductEditModule({ product, categories = [] }: ProductEditModuleProps) {
+  console.log("ProductEditModule rendered with product:", product)
+
   // State for product image
   const [productImage, setProductImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(product.imageUrl || null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
   const submit = useSubmit()
 
   // Update the form default values to use categoryIds instead of category
@@ -65,8 +68,10 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
 
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("File input changed")
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
+      console.log("File selected:", file.name, file.type, file.size)
 
       // Validate file type
       if (!file.type.startsWith("image/")) {
@@ -89,6 +94,7 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
       }
 
       setProductImage(file)
+      console.log("Product image set")
 
       // Update form value
       form.setValue("image", file)
@@ -97,6 +103,7 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
       const reader = new FileReader()
       reader.onloadend = () => {
         setImagePreview(reader.result as string)
+        console.log("Image preview set")
       }
       reader.readAsDataURL(file)
     }
@@ -104,19 +111,23 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
 
   // Trigger file input click
   const handleUploadClick = () => {
+    console.log("Upload button clicked")
     fileInputRef.current?.click()
   }
 
   // Update the onSubmit function to use categoryIds
   const onSubmit = async (data: ProductFormUIValues) => {
+    console.log("Form submitted with data:", data)
     try {
       setIsSubmitting(true)
+      console.log("Setting isSubmitting to true")
 
       // Prepare the data for the backend
       let imageUrl = product.imageUrl
 
       // If a new image was uploaded, process it
       if (productImage) {
+        console.log("Uploading new image...")
         try {
           // Generate a key for the file using product name and timestamp
           const productName = data.name.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()
@@ -129,6 +140,7 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
           }
 
           imageUrl = uploadedUrl
+          console.log("New image uploaded successfully, URL:", imageUrl)
 
           toast({
             title: "Image uploaded",
@@ -155,8 +167,11 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
         imageUrl: imageUrl,
       }
 
-      // Submit the data
-      submit(productData, { method: "post", encType: "application/json" })
+      console.log("Submitting product data to backend:", productData)
+
+      // Submit the data - use PUT method for updates
+      submit(productData, { method: "put", encType: "application/json" })
+      console.log("submit() function called with PUT method")
 
       toast({
         title: "Updating product",
@@ -197,7 +212,7 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
           </CardHeader>
           <CardContent className="p-6">
             <RHFFormProvider {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   {/* Left column - Main product info */}
                   <div className="lg:col-span-2 space-y-6">
@@ -233,78 +248,80 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
                       )}
                     />
 
-                    <FormField
-                      control={form.control}
-                      name="categoryIds"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-base font-medium">Category</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger className="h-11">
-                                <SelectValue placeholder="Select a category" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {categories.length === 0 ? (
-                                <SelectItem value="uncategorized">Uncategorized</SelectItem>
-                              ) : (
-                                categories.map((cat) => (
-                                  <SelectItem key={cat.id} value={cat.id}>
-                                    {cat.name}
-                                  </SelectItem>
-                                ))
-                              )}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="categoryIds"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-medium">Category</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger className="h-11">
+                                  <SelectValue placeholder="Select a category" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {categories.length === 0 ? (
+                                  <SelectItem value="uncategorized">Uncategorized</SelectItem>
+                                ) : (
+                                  categories.map((cat) => (
+                                    <SelectItem key={cat.id} value={cat.id}>
+                                      {cat.name}
+                                    </SelectItem>
+                                  ))
+                                )}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                    <FormField
-                      control={form.control}
-                      name="price"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-base font-medium">Price</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                      <FormField
+                        control={form.control}
+                        name="price"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-medium">Price</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                                <Input
+                                  {...field}
+                                  type="number"
+                                  step="0.01"
+                                  className="pl-8 h-11"
+                                  onChange={(e) => field.onChange(Number.parseFloat(e.target.value))}
+                                  placeholder="0.00"
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="stock"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-base font-medium">Stock Quantity</FormLabel>
+                            <FormControl>
                               <Input
                                 {...field}
                                 type="number"
-                                step="0.01"
-                                className="pl-8 h-11"
-                                onChange={(e) => field.onChange(Number.parseFloat(e.target.value))}
-                                placeholder="0.00"
+                                className="h-11"
+                                placeholder="Enter available quantity"
+                                onChange={(e) => field.onChange(Number.parseInt(e.target.value, 10))}
                               />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="stock"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-base font-medium">Stock Quantity</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="number"
-                              className="h-11"
-                              placeholder="Enter available quantity"
-                              onChange={(e) => field.onChange(Number.parseInt(e.target.value, 10))}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
 
                   {/* Right column - Image upload */}
@@ -367,7 +384,7 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
 
                 {/* Action buttons */}
                 <div className="flex justify-end gap-4 pt-4 border-t">
-                  <Link to="/products">
+                  <Link to={`/products/${product.id}`}>
                     <Button type="button" variant="outline" className="px-6">
                       Cancel
                     </Button>

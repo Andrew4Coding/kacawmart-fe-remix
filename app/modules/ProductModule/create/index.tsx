@@ -513,16 +513,6 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
                     <Save className="mr-2 h-4 w-4" />
                     {isSubmitting ? "Creating..." : "Create Product"}
                   </Button>
-
-                  {/* Debug button - direct submission */}
-                  <Button
-                    type="button"
-                    onClick={handleDirectSubmit}
-                    className="bg-blue-500 hover:bg-blue-600 px-6"
-                    disabled={isSubmitting}
-                  >
-                    Debug Submit
-                  </Button>
                 </div>
               </form>
             </RHFFormProvider>

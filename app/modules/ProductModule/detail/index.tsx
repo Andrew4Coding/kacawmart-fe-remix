@@ -52,7 +52,7 @@ export default function ProductDetailModule({
               <div>
                 <h2 className="text-lg font-semibold">Category</h2>
                 <p className="text-gray-700">
-                  {product.category?.name || "Uncategorized"} {/* Fixed category display */}
+                  {product.category[0]?.name || "Uncategorized"} {/* Fixed category display */}
                 </p>
               </div>
 

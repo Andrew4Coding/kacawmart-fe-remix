@@ -4,7 +4,6 @@ export async function uploadFile(file: File, key: string): Promise<string | unde
     formData.append('key', key);
 
     try {
-        // nyobaaa nambahin await
         const response = fetch('/upload', {
             method: 'POST',
             body: formData,
@@ -17,8 +16,7 @@ export async function uploadFile(file: File, key: string): Promise<string | unde
         if (data.success) {
             return data.url;
         }
-        //nyoba juga
-        return undefined // Explicitly return undefined if success is false
+        
     }
     catch (error) {
         console.error(error);
