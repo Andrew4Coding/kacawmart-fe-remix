@@ -13,11 +13,6 @@ import {
 } from "~/components/ui/dropdown-menu"
 import { cn } from "~/lib/utils"
 
-interface SessionData {
-  email: string
-  name: string
-}
-
 interface NavbarNavigationProps {
   name: string;
   path: string;
@@ -80,12 +75,13 @@ export default function Navbar() {
 
   // Get user initials for avatar
   const getInitials = (name: string) => {
-    return name
+    return name ? name
       .split(" ")
       .map((part) => part[0])
       .join("")
       .toUpperCase()
       .substring(0, 2)
+      : ""
   }
 
   // Check if a link is active
