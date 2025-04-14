@@ -1,13 +1,12 @@
-// modules/KacawPayModule/index.tsx
+import { useLoaderData } from "@remix-run/react";
 import { useState } from "react";
-import { Form, useFetcher, useLoaderData } from "@remix-run/react";
+import { toast } from "sonner";
+import AvailableVouchersModal from "./components/AvailableVouchersModal";
+import BuyVoucherModal from "./components/BuyVoucherModal";
 import TopUpModal from "./components/TopUpModal";
 import VoucherCard from "./components/VoucherCard";
 import { loader } from "./loader";
-import AvailableVouchersModal from "./components/AvailableVouchersModal";
-import BuyVoucherModal from "./components/BuyVoucherModal";
 import { Voucher } from "./type";
-
 
 export default function KacawPayModule() {
   const { wallet, vouchers } = useLoaderData<typeof loader>();
@@ -16,31 +15,49 @@ export default function KacawPayModule() {
   const [showBuyVoucherModal, setShowBuyVoucherModal] = useState(false);
   const [showAvailableVouchersModal, setShowAvailableVouchersModal] = useState(false);
   const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
-  const fetcher = useFetcher();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  // const submit = useSubmit();
 
-  const handleBuyVoucher = (voucher: Voucher) => { // Added type annotation
+  const handleBuyVoucher = (voucher: Voucher) => {
     setSelectedVoucher(voucher);
-    if (wallet.balance >= voucher.price) {
-      setShowBuyVoucherModal(true);
-    } else {
-      setShowBuyVoucherModal(true);
-    }
+    setShowBuyVoucherModal(true);
   };
 
-  const confirmPurchase = () => {
+  const confirmPurchase = async () => {
     if (!selectedVoucher) return;
     
-    fetcher.submit(
-      JSON.stringify({ voucherId: selectedVoucher.id }), // Stringify the payload
-      {
-        method: "POST",
-        action: "/api/vouchers/purchase",
-        encType: "application/json", // Set content type
-      }
-    );
+    setIsProcessing(true);
+    
+    const response = await fetch(`/api/voucher/purchase`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        Cookie: document.cookie
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        voucherId: selectedVoucher.id
+      })
+    })
+
+    setIsProcessing(false);
+
+    if (!response.ok) {
+      return toast.error("Error!")
+    }
+
+    // Tutup modal pembelian
     setShowBuyVoucherModal(false);
+    
+    // Tampilkan modal success
+    setShowSuccessModal(true);
+    
+    // Reset selected voucher
     setSelectedVoucher(null);
   };
+
   // Handle case when wallet data is not available
   if (!wallet) {
     return (
@@ -131,6 +148,15 @@ export default function KacawPayModule() {
         </div>
       )}
 
+      {/* Show processing state */}
+      {isProcessing && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg">
+            <p className="text-lg">Processing your purchase...</p>
+          </div>
+        </div>
+      )}
+
       {/* Top Up Modal */}
       <TopUpModal 
         isOpen={showTopUpModal} 
@@ -148,7 +174,7 @@ export default function KacawPayModule() {
 
       {/* Buy Voucher Confirmation Modal */}
       <BuyVoucherModal
-        isOpen={showBuyVoucherModal} // Fixed: pass the state value, not the setter
+        isOpen={showBuyVoucherModal}
         onClose={() => {
           setShowBuyVoucherModal(false);
           setSelectedVoucher(null);
@@ -157,7 +183,50 @@ export default function KacawPayModule() {
         voucher={selectedVoucher}
         walletBalance={wallet.balance || 0}
       />
+      
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-md max-w-md w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Purchase Voucher Success</h2>
+              <button 
+                onClick={() => setShowSuccessModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <div className="mb-6 flex justify-center items-center">
+              <div className="bg-green-100 p-3 rounded-full">
+                <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+            </div>
+            
+            <div className="text-center mb-6">
+              <p className="text-gray-600">Your voucher has been successfully purchased!</p>
+            </div>
+            
+            <div className="flex justify-center">
+              <button 
+                onClick={() => {
+                  setShowAvailableVouchersModal(false);
+                  setShowSuccessModal(false);
+                  setActiveTab('vouchers');
+                }}
+                className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

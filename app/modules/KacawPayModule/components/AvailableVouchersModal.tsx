@@ -49,7 +49,7 @@ export default function AvailableVouchersModal({
                 <p>Price: Rp {voucher.price.toLocaleString('id-ID')}</p>
                 {voucher.discount && (
                   <>
-                    <p>Value: {voucher.discount.value}% off</p>
+                    <p>Value: {voucher.discount.value}</p>
                     <p>Expires: {new Date(voucher.discount.expiredAt).toLocaleDateString()}</p>
                   </>
                 )}
