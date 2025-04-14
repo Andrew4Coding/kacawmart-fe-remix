@@ -1,35 +1,14 @@
-import { useState, useEffect } from "react"
-import { Trash2, MinusCircle, PlusCircle, ShoppingCart, AlertCircle } from "lucide-react"
+import { Link, useLoaderData } from "@remix-run/react"
+import { AlertCircle, MinusCircle, PlusCircle, ShoppingCart, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { Alert, AlertDescription } from "~/components/ui/alert"
+import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardFooter } from "~/components/ui/card"
-import { Badge } from "~/components/ui/badge"
-import { Separator } from "~/components/ui/separator"
-import { Alert, AlertDescription } from "~/components/ui/alert"
-import { toast } from "sonner"
-import { Link } from "@remix-run/react"
 import Image from "~/components/ui/image"
-
-interface Product {
-  id: string
-  name: string
-  price: number
-  imageUrl: string
-  stock: number
-}
-
-interface CartProduct {
-  id: string
-  amount: number
-  price: number
-  productId: string
-  product: Product
-}
-
-interface CartResponse {
-  success: boolean
-  message?: string
-  products: CartProduct[]
-}
+import { Separator } from "~/components/ui/separator"
+import { CartProduct } from "./types"
 
 // Format price to IDR
 const formatPrice = (price: number) => {
@@ -47,33 +26,16 @@ export default function CartModule() {
   const [error, setError] = useState<string | null>(null)
   const [isUpdating, setIsUpdating] = useState(false)
 
+  const loaderData: CartProduct[] = useLoaderData();
+
   useEffect(() => {
-    fetchCart()
-  }, [])
-
-  const fetchCart = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch("/api/cart")
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch cart")
-      }
-
-      const data: CartResponse = await response.json()
-
-      if (data.success) {
-        setCartItems(data.products || [])
-      } else {
-        setError(data.message || "Failed to load cart")
-      }
-    } catch (err) {
-      setError("Failed to load cart. Please try again later.")
-      console.error("Error fetching cart:", err)
-    } finally {
-      setLoading(false)
+    if (loaderData) {
+      setCartItems(loaderData)
+    } else {
+      setError("Failed to load cart items.")
     }
-  }
+    setLoading(false)
+  }, [loaderData])
 
   const updateQuantity = async (productQuantityId: string, quantity: number) => {
     if (quantity < 1) return

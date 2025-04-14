@@ -1,6 +1,6 @@
-import { Link } from "@remix-run/react"
+import { Link, useLoaderData } from "@remix-run/react"
 import { AlertCircle, CheckCircle, CreditCard, ShieldCheck } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { toast } from "sonner"
 import { Alert, AlertDescription } from "~/components/ui/alert"
 import { Badge } from "~/components/ui/badge"
@@ -46,35 +46,12 @@ const formatPrice = (price: number) => {
 }
 
 export default function CheckoutModule() {
-  const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null)
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderComplete, setOrderComplete] = useState(false)
   const [discountCode, setDiscountCode] = useState("")
 
-  useEffect(() => {
-    fetchCheckoutData()
-  }, [])
-
-  const fetchCheckoutData = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch("/api/cart/checkout")
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch checkout data")
-      }
-
-      const data: CheckoutData = await response.json()
-      setCheckoutData(data)
-    } catch (err) {
-      setError("Failed to load checkout data. Please try again later.")
-      console.error("Error fetching checkout data:", err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const checkoutData: CheckoutData | null = useLoaderData();
 
   const handleApplyDiscount = () => {
     if (!discountCode.trim()) {
@@ -118,7 +95,7 @@ export default function CheckoutModule() {
   }
 
   // Check if cart is empty
-  const isCartEmpty = checkoutData?.products?.length === 0 && !loading
+  const isCartEmpty = checkoutData?.products?.length === 0
 
   if (orderComplete) {
     return (
@@ -184,12 +161,7 @@ export default function CheckoutModule() {
             </Alert>
           )}
 
-          {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
-              <p className="ml-4 text-lg text-gray-600">Loading checkout information...</p>
-            </div>
-          ) : isCartEmpty ? (
+          {isCartEmpty ? (
             <div className="text-center py-16 bg-white rounded-lg shadow-sm">
               <AlertCircle className="h-16 w-16 mx-auto text-gray-300 mb-4" />
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
