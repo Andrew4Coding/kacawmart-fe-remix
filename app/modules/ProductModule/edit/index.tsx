@@ -19,7 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 
 import { type ProductFormUIValues, productFormSchema } from "../type"
-import { uploadImage } from "~/lib/upload-image"
+import { uploadFile } from "~/lib/file" // Import the existing uploadFile function
 
 type Category = {
   id: string
@@ -118,7 +118,18 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
       // If a new image was uploaded, process it
       if (productImage) {
         try {
-          imageUrl = await uploadImage(productImage)
+          // Generate a key for the file using product name and timestamp
+          const productName = data.name.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()
+          const key = `products/${Date.now()}-${productName}`
+
+          const uploadedUrl = await uploadFile(productImage, key)
+
+          if (!uploadedUrl) {
+            throw new Error("Failed to get image URL from upload")
+          }
+
+          imageUrl = uploadedUrl
+
           toast({
             title: "Image uploaded",
             description: "Image uploaded successfully",

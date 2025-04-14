@@ -76,6 +76,16 @@ export default function ProductDetailPage() {
   // Get the categories data from the loader
   const data = useLoaderData<typeof loader>()
 
-  // Pass the categories to the ProductCreateModule
-  return <ProductCreateModule categories={data.categories} />
+  console.log("ProductDetailPage rendering with data:", data)
+
+  // Add a simple wrapper to help debug rendering issues
+  return (
+    <>
+      <div style={{ padding: "20px", background: "#f0f0f0", marginBottom: "20px" }}>
+        <h2>Debug: Product Create Page</h2>
+        <p>Categories loaded: {data.categories.length}</p>
+      </div>
+      <ProductCreateModule categories={data.categories} />
+    </>
+  )
 }

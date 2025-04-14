@@ -1,10 +1,9 @@
 "use client"
 
 import type React from "react"
-
+import { useState, useRef, useEffect } from "react"
 import { Link, useSubmit } from "@remix-run/react"
 import { Save, Camera } from "lucide-react"
-import { useState, useRef, useEffect } from "react"
 import { toast } from "~/components/ui/use-toast"
 
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form"
@@ -20,7 +19,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 
 // Import the updated schemas
 import { type ProductFormUIValues, productFormSchema } from "../type"
-import { uploadImage } from "~/lib/upload-image"
+import { uploadFile } from "~/lib/file" // Import the existing uploadFile function
+
+// Replace useLayoutEffect with useEffect for SSR compatibility
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useEffect : useEffect
 
 type Category = {
   id: string
@@ -33,6 +35,15 @@ interface ProductCreateModuleProps {
 
 export default function ProductCreateModule({ categories = [] }: ProductCreateModuleProps) {
   console.log("ProductCreateModule rendered with categories:", categories)
+
+  // Add a state to track if we're on the client
+  const [isClient, setIsClient] = useState(false)
+
+  // Use useEffect to set isClient to true after mount
+  useEffect(() => {
+    setIsClient(true)
+    console.log("Component mounted on client")
+  }, [])
 
   // State for product image
   const [productImage, setProductImage] = useState<File | null>(null)
@@ -132,11 +143,23 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
         return
       }
 
-      // First upload the image to get a URL - this is the key step we were missing
+      // Generate a key for the file using product name and timestamp
+      const productName = form
+        .getValues("name")
+        .replace(/[^a-zA-Z0-9]/g, "_")
+        .toLowerCase()
+      const key = `products/${Date.now()}-${productName}`
+
+      // First upload the image to get a URL using the existing uploadFile function
       console.log("Uploading image for debug submission...")
       let imageUrl
       try {
-        imageUrl = await uploadImage(productImage)
+        imageUrl = await uploadFile(productImage, key)
+
+        if (!imageUrl) {
+          throw new Error("Failed to get image URL from upload")
+        }
+
         console.log("Debug: Image uploaded successfully, URL:", imageUrl)
       } catch (error) {
         console.error("Debug: Error uploading image:", error)
@@ -208,11 +231,20 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
         return
       }
 
+      // Generate a key for the file using product name and timestamp
+      const productName = data.name.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()
+      const key = `products/${Date.now()}-${productName}`
+
       console.log("Uploading image...")
-      // First upload the image
+      // First upload the image using the existing uploadFile function
       let imageUrl
       try {
-        imageUrl = await uploadImage(productImage)
+        imageUrl = await uploadFile(productImage, key)
+
+        if (!imageUrl) {
+          throw new Error("Failed to get image URL from upload")
+        }
+
         console.log("Image uploaded successfully, URL:", imageUrl)
 
         toast({
@@ -259,6 +291,20 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
       })
       setIsSubmitting(false)
     }
+  }
+
+  // If we're not on the client yet, render a simple loading state
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-[#f0faf5] p-6 md:p-10 lg:p-20 pt-40">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-2">Create New Product</h1>
+            <p>Loading product form...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

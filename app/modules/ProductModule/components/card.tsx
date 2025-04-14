@@ -42,7 +42,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <div className="mt-4 flex-grow">
-          <h3 className="font-medium">Description</h3>
+          
           <p className="text-sm text-gray-600 mt-1 line-clamp-2">
             {truncateText(product.description, 100)}
           </p> 
