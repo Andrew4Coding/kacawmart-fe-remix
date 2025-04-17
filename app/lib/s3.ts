@@ -9,12 +9,12 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { UploadHandler } from '@remix-run/node';
 
-export const Bucket = process.env.AWS_AMPLIFY_BUCKET;
+export const Bucket = process.env.PODS_AWS_AMPLIFY_BUCKET;
 export const s3 = new S3Client({
-    region: process.env.AWS_REGION,
+    region: process.env.PODS_AWS_REGION,
     credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+        accessKeyId: process.env.PODS_AWS_ACCESS_KEY_ID as string,
+        secretAccessKey: process.env.PODS_AWS_SECRET_ACCESS_KEY as string,
     },
 });
 
