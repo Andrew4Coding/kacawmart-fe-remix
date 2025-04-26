@@ -9,9 +9,9 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   // Fungsi untuk memotong teks
   const truncateText = (text: string, maxLength: number) => {
-    if (!text) return '';
+    if (!text) return "";
     if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+    return text.substring(0, maxLength) + "...";
   };
 
   return (
@@ -28,8 +28,8 @@ export default function ProductCard({ product }: ProductCardProps) {
             />
           </div>
           <div>
-            <Link 
-              to={`/products/${product.id}`} 
+            <Link
+              to={`/products/${product.id}`}
               className="text-lg font-medium hover:text-emerald-600 line-clamp-1"
             >
               {truncateText(product.name, 35)}
@@ -42,10 +42,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <div className="mt-4 flex-grow">
-          
           <p className="text-sm text-gray-600 mt-1 line-clamp-2">
             {truncateText(product.description, 100)}
-          </p> 
+          </p>
         </div>
 
         <div className="mt-4 border rounded-md">
@@ -55,7 +54,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
           <div className="grid grid-cols-2 border-b p-2">
             <div className="text-gray-600">Rating</div>
-            <div className="text-right">{product.productRating?.toFixed(1) || 'N/A'}</div>
+            <div className="text-right">
+              {product.productRating?.toFixed(1) || "N/A"}
+            </div>
           </div>
           <div className="grid grid-cols-2 p-2">
             <div className="text-gray-600">Stocks</div>
@@ -64,10 +65,10 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <Link to={`/products/${product.id}`}>
-        <button className="w-full mt-4 bg-emerald-600 text-white py-2 rounded-md flex items-center justify-center gap-2">
-          <CirclePlus className="h-5 w-5" />
-          Manage
-        </button>
+          <button className="w-full mt-4 bg-emerald-600 text-white py-2 rounded-md flex items-center justify-center gap-2">
+            <CirclePlus className="h-5 w-5" />
+            Manage
+          </button>
         </Link>
       </div>
     </div>

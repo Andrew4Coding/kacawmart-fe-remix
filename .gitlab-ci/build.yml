@@ -1,6 +1,6 @@
 build_image:
   stage: build
-  image: 
+  image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   script:

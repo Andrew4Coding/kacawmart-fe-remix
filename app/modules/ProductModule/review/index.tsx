@@ -1,88 +1,109 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "~/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
-import ReviewCard from "../components/review-card"
-import RatingSummary from "../components/rating-summary"
+import { useState } from "react";
+import { Button } from "~/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import ReviewCard from "../components/review-card";
+import RatingSummary from "../components/rating-summary";
 
 interface Review {
-  title: string
-  content: string
-  rating: number
-  customerId: string
-  customerName: string
-  createdAt?: string
+  title: string;
+  content: string;
+  rating: number;
+  customerId: string;
+  customerName: string;
+  createdAt?: string;
 }
 
 interface ReviewsModuleProps {
-  productId: string
-  productRating: number
-  ratingCount: number
-  reviews: Review[]
+  productId: string;
+  productRating: number;
+  ratingCount: number;
+  reviews: Review[];
 }
 
-export default function ReviewsModule({ productId, productRating, ratingCount, reviews }: ReviewsModuleProps) {
-  const [sortOption, setSortOption] = useState("newest")
-  const [filterRating, setFilterRating] = useState("all")
-  const [displayedReviews, setDisplayedReviews] = useState(reviews)
+export default function ReviewsModule({
+  productId,
+  productRating,
+  ratingCount,
+  reviews,
+}: ReviewsModuleProps) {
+  const [sortOption, setSortOption] = useState("newest");
+  const [filterRating, setFilterRating] = useState("all");
+  const [displayedReviews, setDisplayedReviews] = useState(reviews);
 
   // Calculate rating distribution
   const ratingDistribution = reviews.reduce(
     (acc, review) => {
-      acc[review.rating] = (acc[review.rating] || 0) + 1
-      return acc
+      acc[review.rating] = (acc[review.rating] || 0) + 1;
+      return acc;
     },
     {} as { [key: number]: number },
-  )
+  );
 
   // Handle sorting and filtering
   const handleSortChange = (value: string) => {
-    setSortOption(value)
-    sortAndFilterReviews(value, filterRating)
-  }
+    setSortOption(value);
+    sortAndFilterReviews(value, filterRating);
+  };
 
   const handleFilterChange = (value: string) => {
-    setFilterRating(value)
-    sortAndFilterReviews(sortOption, value)
-  }
+    setFilterRating(value);
+    sortAndFilterReviews(sortOption, value);
+  };
 
   const sortAndFilterReviews = (sort: string, filter: string) => {
-    let filtered = [...reviews]
+    let filtered = [...reviews];
 
     // Apply filter
     if (filter !== "all") {
-      const ratingFilter = Number.parseInt(filter)
-      filtered = filtered.filter((review) => review.rating === ratingFilter)
+      const ratingFilter = Number.parseInt(filter);
+      filtered = filtered.filter((review) => review.rating === ratingFilter);
     }
 
     // Apply sort
     switch (sort) {
       case "highest":
-        filtered.sort((a, b) => b.rating - a.rating)
-        break
+        filtered.sort((a, b) => b.rating - a.rating);
+        break;
       case "lowest":
-        filtered.sort((a, b) => a.rating - b.rating)
-        break
+        filtered.sort((a, b) => a.rating - b.rating);
+        break;
       case "newest":
       default:
         // Assuming reviews have createdAt, otherwise keep original order
         if (filtered[0]?.createdAt) {
-          filtered.sort((a, b) => new Date(b.createdAt || "").getTime() - new Date(a.createdAt || "").getTime())
+          filtered.sort(
+            (a, b) =>
+              new Date(b.createdAt || "").getTime() -
+              new Date(a.createdAt || "").getTime(),
+          );
         }
-        break
+        break;
     }
 
-    setDisplayedReviews(filtered)
-  }
+    setDisplayedReviews(filtered);
+  };
 
   return (
     <div className="space-y-6">
-      <RatingSummary productRating={productRating} ratingCount={ratingCount} ratingDistribution={ratingDistribution} />
+      <RatingSummary
+        productRating={productRating}
+        ratingCount={ratingCount}
+        ratingDistribution={ratingDistribution}
+      />
 
       <div className="bg-white p-6 rounded-lg shadow-sm">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-          <h3 className="text-lg font-semibold mb-2 sm:mb-0">Customer Reviews ({reviews.length})</h3>
+          <h3 className="text-lg font-semibold mb-2 sm:mb-0">
+            Customer Reviews ({reviews.length})
+          </h3>
 
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
             <div className="flex items-center">
@@ -125,17 +146,22 @@ export default function ReviewsModule({ productId, productRating, ratingCount, r
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">No reviews match your filter criteria</div>
+          <div className="text-center py-8 text-gray-500">
+            No reviews match your filter criteria
+          </div>
         )}
 
         {displayedReviews.length > 5 && (
           <div className="mt-6 text-center">
-            <Button variant="outline" className="border-emerald-500 text-emerald-500 hover:bg-emerald-50">
+            <Button
+              variant="outline"
+              className="border-emerald-500 text-emerald-500 hover:bg-emerald-50"
+            >
               Load More Reviews
             </Button>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

@@ -1,24 +1,26 @@
-export async function uploadFile(file: File, key: string): Promise<string | undefined> {
-    const formData = new FormData();
-    formData.append('upload', file);
-    formData.append('key', key);
+export async function uploadFile(
+  file: File,
+  key: string,
+): Promise<string | undefined> {
+  const formData = new FormData();
+  formData.append("upload", file);
+  formData.append("key", key);
 
-    try {
-        const response = fetch('/upload', {
-            method: 'POST',
-            body: formData,
-        });
+  try {
+    const response = fetch("/upload", {
+      method: "POST",
+      body: formData,
+    });
 
-        
-        const data: { url: string, success: boolean } = await (await response).json();
-        console.log("Upload response data:", data)
+    const data: { url: string; success: boolean } = await (
+      await response
+    ).json();
+    console.log("Upload response data:", data);
 
-        if (data.success) {
-            return data.url;
-        }
-        
+    if (data.success) {
+      return data.url;
     }
-    catch (error) {
-        console.error(error);
-    }
+  } catch (error) {
+    console.error(error);
+  }
 }

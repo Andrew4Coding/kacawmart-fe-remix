@@ -11,7 +11,7 @@ export interface Discount {
   code: string;
   value: number;
   expiredAt: string;
-  maxUsage?: number;  // Make optional if not always present
+  maxUsage?: number; // Make optional if not always present
   usageCount?: number; // Make optional if not always present
 }
 
@@ -20,7 +20,7 @@ export interface Voucher {
   price: number;
   discountId: string;
   discount: Discount;
-  createdAt?: string;  // Make optional if not always present
+  createdAt?: string; // Make optional if not always present
 }
 
 export type LoaderData = {

@@ -1,28 +1,31 @@
-import { Star } from "lucide-react"
-import { formatDatee } from "~/lib/utils"
+import { Star } from "lucide-react";
+import { formatDatee } from "~/lib/utils";
 
 interface ReviewCardProps {
   review: {
-    title: string
-    content: string
-    rating: number
-    customerId: string
-    customerName: string
-    createdAt?: string
-  }
+    title: string;
+    content: string;
+    rating: number;
+    customerId: string;
+    customerName: string;
+    createdAt?: string;
+  };
 }
 
 export default function ReviewCard({ review }: ReviewCardProps) {
   // Generate stars based on rating
   const renderStars = (rating: number) => {
-    const stars = []
+    const stars = [];
     for (let i = 1; i <= 5; i++) {
       stars.push(
-        <Star key={i} className={`h-4 w-4 ${i <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`} />,
-      )
+        <Star
+          key={i}
+          className={`h-4 w-4 ${i <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
+        />,
+      );
     }
-    return stars
-  }
+    return stars;
+  };
 
   return (
     <div className="border-b border-gray-100 py-6">
@@ -33,7 +36,11 @@ export default function ReviewCard({ review }: ReviewCardProps) {
           </div>
           <span className="font-medium">{review.customerName}</span>
         </div>
-        {review.createdAt && <span className="text-sm text-gray-500">{formatDatee(new Date(review.createdAt))}</span>}
+        {review.createdAt && (
+          <span className="text-sm text-gray-500">
+            {formatDatee(new Date(review.createdAt))}
+          </span>
+        )}
       </div>
 
       <div className="flex items-center mb-3">
@@ -44,5 +51,5 @@ export default function ReviewCard({ review }: ReviewCardProps) {
       <h4 className="font-semibold mb-2">{review.title}</h4>
       <p className="text-gray-600">{review.content}</p>
     </div>
-  )
+  );
 }

@@ -25,15 +25,13 @@ export const links: LinksFunction = () => [
 
 export const meta: MetaFunction = () => {
   return [
-    { title: 'KacawMart' },
+    { title: "KacawMart" },
     {
-      name: 'description',
-      content:
-        'KacawMart is a simple e-commerce platform built with Remix.',
+      name: "description",
+      content: "KacawMart is a simple e-commerce platform built with Remix.",
     },
   ];
 };
-
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (

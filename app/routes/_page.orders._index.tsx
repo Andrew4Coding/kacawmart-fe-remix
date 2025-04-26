@@ -1,7 +1,7 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import fetchServer from "~/lib/fetch";
-import OrderModule from "~/modules/OrderModule"
+import OrderModule from "~/modules/OrderModule";
 
 // Sample data based on the provided structure
 // const sampleOrders = [
@@ -118,14 +118,14 @@ import OrderModule from "~/modules/OrderModule"
 // ]
 
 export async function loader(args: LoaderFunctionArgs) {
-    const data = await fetchServer(args.request, '/api/seller/orders')
+  const data = await fetchServer(args.request, "/api/seller/orders");
 
-    console.log("orders"+ data);
-    
-    return data;
+  console.log("orders" + data);
+
+  return data;
 }
 
 export default function OrdersPage() {
-  const data = useLoaderData()
-  return <OrderModule orders={data.orders} />
+  const data = useLoaderData();
+  return <OrderModule orders={data.orders} />;
 }

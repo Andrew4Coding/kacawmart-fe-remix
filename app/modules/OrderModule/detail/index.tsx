@@ -1,92 +1,92 @@
-import { Link, useFetcher } from "@remix-run/react"
-import { ArrowLeft, Truck, Package, Calendar, CreditCard } from "lucide-react"
-import { useState, useEffect } from "react"
-import { Badge } from "~/components/ui/badge"
-import { Button } from "~/components/ui/button"
-import { toast } from "~/components/ui/use-toast"
-import { formatCurrency, formatDatee, formatPrice } from "~/lib/utils"
+import { Link, useFetcher } from "@remix-run/react";
+import { ArrowLeft, Truck, Package, Calendar, CreditCard } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { toast } from "~/components/ui/use-toast";
+import { formatCurrency, formatDatee, formatPrice } from "~/lib/utils";
 
 interface OrderProduct {
-  id: string
-  amount: number
-  price: number
-  productId: string
+  id: string;
+  amount: number;
+  price: number;
+  productId: string;
   product: {
-    id: string
-    name: string
-    description: string
-    price: number
-    imageUrl: string
-    ratingCount: number
-    productRating: number
-    stock: number
-  } | null
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    imageUrl: string;
+    ratingCount: number;
+    productRating: number;
+    stock: number;
+  } | null;
 }
 
 interface Order {
-  id: string
-  deliveryStatus: string
-  totalPrice: number
-  totalProduct: number
-  transactionId: string
-  discountId: string | null
-  createdAt: string
-  updatedAt: string
-  product: OrderProduct[] | null
+  id: string;
+  deliveryStatus: string;
+  totalPrice: number;
+  totalProduct: number;
+  transactionId: string;
+  discountId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  product: OrderProduct[] | null;
 }
 
 interface OrderDetailProps {
-  order: Order
+  order: Order;
 }
 
 export default function OrderDetailModule({ order }: OrderDetailProps) {
-  const fetcher = useFetcher()
-  const [isUpdating, setIsUpdating] = useState(false)
+  const fetcher = useFetcher();
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Get status color based on delivery status
   const getStatusColor = (status: string) => {
     switch (status) {
       case "DELIVERED":
-        return "bg-emerald-100 text-emerald-800"
+        return "bg-emerald-100 text-emerald-800";
       case "PENDING":
-        return "bg-amber-100 text-amber-800"
+        return "bg-amber-100 text-amber-800";
       case "SHIPPED":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "CANCELLED":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       case "ON_DELIVERY":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   // Handle update delivery status
   const handleUpdateDeliveryStatus = () => {
-    console.log("Updating delivery status for order:", order.id)
-    setIsUpdating(true)
-    
+    console.log("Updating delivery status for order:", order.id);
+    setIsUpdating(true);
+
     fetcher.submit(
       {},
-      { method: "patch", action: `/api/seller/orders/${order.id}/confirm` }
-    )
-  }
+      { method: "patch", action: `/api/seller/orders/${order.id}/confirm` },
+    );
+  };
 
   // Get button text based on current status
   const getButtonText = () => {
-    if (isUpdating) return "Updating..."
-    
+    if (isUpdating) return "Updating...";
+
     switch (order.deliveryStatus) {
       case "PENDING":
-        return "Mark as On Delivery"
+        return "Mark as On Delivery";
       case "ON_DELIVERY":
-        return "Mark as Delivered"
+        return "Mark as Delivered";
       case "DELIVERED":
-        return "Already Delivered"
+        return "Already Delivered";
       default:
-        return "Update Status"
+        return "Update Status";
     }
-  }
+  };
 
   // Define TypeScript interface for fetcher data
   interface FetcherData {
@@ -94,32 +94,32 @@ export default function OrderDetailModule({ order }: OrderDetailProps) {
     success?: boolean;
     updated?: any;
   }
-  
+
   // Listen for completion of the fetch request
   useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data) {
-      setIsUpdating(false)
-      
+      setIsUpdating(false);
+
       // Type cast the data to our interface
       const responseData = fetcher.data as FetcherData;
-      
+
       if (responseData.error) {
         toast({
           title: "Error",
           description: responseData.error,
           variant: "destructive",
-        })
+        });
       } else {
         toast({
           title: "Success",
           description: "Order status updated successfully",
-        })
-        
+        });
+
         // Reload the page to show updated data
-        window.location.reload()
+        window.location.reload();
       }
     }
-  }, [fetcher.state, fetcher.data])
+  }, [fetcher.state, fetcher.data]);
 
   return (
     <div className="min-h-screen bg-[#f0faf5] p-20 pt-40">
@@ -149,7 +149,9 @@ export default function OrderDetailModule({ order }: OrderDetailProps) {
               </div>
             </div>
             <div className="mt-4 md:mt-0 flex items-center">
-              <Badge className={`${getStatusColor(order.deliveryStatus)} text-sm px-3 py-1`}>
+              <Badge
+                className={`${getStatusColor(order.deliveryStatus)} text-sm px-3 py-1`}
+              >
                 {order.deliveryStatus}
               </Badge>
             </div>
@@ -164,23 +166,34 @@ export default function OrderDetailModule({ order }: OrderDetailProps) {
                     <div key={item.id} className="flex gap-4 border-b pb-4">
                       <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden flex-shrink-0">
                         <img
-                          src={item.product?.imageUrl || "/placeholder.svg?height=80&width=80"}
+                          src={
+                            item.product?.imageUrl ||
+                            "/placeholder.svg?height=80&width=80"
+                          }
                           alt={item.product?.name || "Product image"}
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <div className="flex-grow">
-                        <h4 className="font-medium">{item.product?.name || "Product name unavailable"}</h4>
+                        <h4 className="font-medium">
+                          {item.product?.name || "Product name unavailable"}
+                        </h4>
                         <div className="flex justify-between mt-2">
-                          <div className="text-sm text-gray-600">Quantity: {item.amount}</div>
-                          <div className="font-medium">{formatPrice(item.product.price)}</div>
+                          <div className="text-sm text-gray-600">
+                            Quantity: {item.amount}
+                          </div>
+                          <div className="font-medium">
+                            {formatPrice(item.product.price)}
+                          </div>
                         </div>
                       </div>
                     </div>
                   ))}
 
                 {(!order.product || order.product.length === 0) && (
-                  <div className="text-center py-8 text-gray-500">No items found in this order</div>
+                  <div className="text-center py-8 text-gray-500">
+                    No items found in this order
+                  </div>
                 )}
               </div>
             </div>
@@ -192,7 +205,9 @@ export default function OrderDetailModule({ order }: OrderDetailProps) {
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Transaction ID</span>
-                    <span className="font-medium">{order.transactionId.substring(0, 8)}...</span>
+                    <span className="font-medium">
+                      {order.transactionId.substring(0, 8)}...
+                    </span>
                   </div>
 
                   <div className="flex justify-between text-sm">
@@ -219,14 +234,18 @@ export default function OrderDetailModule({ order }: OrderDetailProps) {
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Truck className="h-4 w-4" />
                     <span>
-                      Delivery Status: <span className="font-medium">{order.deliveryStatus}</span>
+                      Delivery Status:{" "}
+                      <span className="font-medium">
+                        {order.deliveryStatus}
+                      </span>
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Package className="h-4 w-4" />
                     <span>
-                      Total Products: <span className="font-medium">{order.totalProduct}</span>
+                      Total Products:{" "}
+                      <span className="font-medium">{order.totalProduct}</span>
                     </span>
                   </div>
 
@@ -245,17 +264,19 @@ export default function OrderDetailModule({ order }: OrderDetailProps) {
         </div>
 
         <div className="flex justify-end space-x-4">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="border-emerald-500 text-emerald-500 hover:bg-emerald-50"
             onClick={handleUpdateDeliveryStatus}
             disabled={isUpdating || order.deliveryStatus === "DELIVERED"}
           >
-            {isUpdating ? "Updating..." : 
-              order.deliveryStatus === "DELIVERED" ? "Order Delivered" : 
-              order.deliveryStatus === "PENDING" ? "Mark as On Delivery" : 
-              "Mark as Delivered"
-            }
+            {isUpdating
+              ? "Updating..."
+              : order.deliveryStatus === "DELIVERED"
+                ? "Order Delivered"
+                : order.deliveryStatus === "PENDING"
+                  ? "Mark as On Delivery"
+                  : "Mark as Delivered"}
           </Button>
           <Link to="/orders">
             <Button className="bg-emerald-500 hover:bg-emerald-600">
@@ -265,5 +286,5 @@ export default function OrderDetailModule({ order }: OrderDetailProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

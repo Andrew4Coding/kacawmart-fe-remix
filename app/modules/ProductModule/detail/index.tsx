@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { Link, useParams } from "@remix-run/react"
-import type { Product, Review } from "~/lib/types"
+import { Link, useParams } from "@remix-run/react";
+import type { Product, Review } from "~/lib/types";
 
 interface ProductDetailModuleProps {
-  product: Product
-  reviews?: Review[]
-  ratingCount?: number
-  productRating?: number
+  product: Product;
+  reviews?: Review[];
+  ratingCount?: number;
+  productRating?: number;
 }
 
 export default function ProductDetailModule({
@@ -16,7 +16,7 @@ export default function ProductDetailModule({
   ratingCount = 0,
   productRating = 0,
 }: ProductDetailModuleProps) {
-  const { id } = useParams()
+  const { id } = useParams();
 
   return (
     <div className="min-h-screen bg-[#f0faf5] p-20 pt-40">
@@ -52,13 +52,16 @@ export default function ProductDetailModule({
               <div>
                 <h2 className="text-lg font-semibold">Category</h2>
                 <p className="text-gray-700">
-                  {product.category[0]?.name || "Uncategorized"} {/* Fixed category display */}
+                  {product.category[0]?.name || "Uncategorized"}{" "}
+                  {/* Fixed category display */}
                 </p>
               </div>
 
               <div>
                 <h2 className="text-lg font-semibold">Price</h2>
-                <p className="text-gray-700">{(product.price / 100).toFixed(2)}</p>
+                <p className="text-gray-700">
+                  {(product.price / 100).toFixed(2)}
+                </p>
               </div>
 
               <div>
@@ -71,14 +74,18 @@ export default function ProductDetailModule({
             <div>
               <h2 className="text-lg font-semibold mb-4">Product Images</h2>
               <div className="grid grid-cols-2 gap-4">
-                <img src={product.imageUrl || "/placeholder.svg"} alt="Product Image" className="rounded-lg shadow" />
+                <img
+                  src={product.imageUrl || "/placeholder.svg"}
+                  alt="Product Image"
+                  className="rounded-lg shadow"
+                />
               </div>
             </div>
           </div>
 
           {/* Action buttons */}
           <div className="mt-8 flex justify-end space-x-4">
-          <Link to={`/products/reviews/${id}`}>
+            <Link to={`/products/reviews/${id}`}>
               <button className="border border-emerald-500 hover:bg-emerald-50 hover:text-black text-emerald-500 px-4 py-2 rounded">
                 View Reviews
               </button>
@@ -97,5 +104,5 @@ export default function ProductDetailModule({
         </div>
       </div>
     </div>
-  )
+  );
 }

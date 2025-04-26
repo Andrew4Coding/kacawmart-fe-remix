@@ -1,57 +1,74 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { Link, useSubmit } from "@remix-run/react"
-import { Save, Camera } from "lucide-react"
-import { useState, useRef } from "react"
-import { toast } from "~/components/ui/use-toast"
+import { Link, useSubmit } from "@remix-run/react";
+import { Save, Camera } from "lucide-react";
+import { useState, useRef } from "react";
+import { toast } from "~/components/ui/use-toast";
 
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form"
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, FormProvider as RHFFormProvider } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, FormProvider as RHFFormProvider } from "react-hook-form";
 
-import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
-import { Textarea } from "~/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
-import { type ProductFormUIValues, productFormSchema } from "../type"
-import { uploadFile } from "~/lib/file" // Import the existing uploadFile function
+import { type ProductFormUIValues, productFormSchema } from "../type";
+import { uploadFile } from "~/lib/file"; // Import the existing uploadFile function
 
 type Category = {
-  id: string
-  name: string
-}
+  id: string;
+  name: string;
+};
 
 interface ProductEditModuleProps {
   product: {
-    id: string
-    name: string
-    description: string
-    price: number
-    stock: number
-    imageUrl: string
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    stock: number;
+    imageUrl: string;
     category?: {
-      id: string
-      name: string
-    }
-  }
-  categories: Category[]
+      id: string;
+      name: string;
+    };
+  };
+  categories: Category[];
 }
 
-export default function ProductEditModule({ product, categories = [] }: ProductEditModuleProps) {
-  console.log("ProductEditModule rendered with product:", product)
+export default function ProductEditModule({
+  product,
+  categories = [],
+}: ProductEditModuleProps) {
+  console.log("ProductEditModule rendered with product:", product);
 
   // State for product image
-  const [productImage, setProductImage] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(product.imageUrl || null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const formRef = useRef<HTMLFormElement>(null)
-  const submit = useSubmit()
+  const [productImage, setProductImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    product.imageUrl || null,
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const submit = useSubmit();
 
   // Update the form default values to use categoryIds instead of category
   const form = useForm<ProductFormUIValues>({
@@ -59,19 +76,20 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
     defaultValues: {
       name: product.name,
       description: product.description,
-      categoryIds: product.category?.id || (categories.length > 0 ? categories[0].id : ""), // Changed from 'category' to 'categoryIds'
+      categoryIds:
+        product.category?.id || (categories.length > 0 ? categories[0].id : ""), // Changed from 'category' to 'categoryIds'
       price: product.price / 100, // Convert from cents to dollars for display
       stock: product.stock,
       image: null,
     },
-  })
+  });
 
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("File input changed")
+    console.log("File input changed");
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
-      console.log("File selected:", file.name, file.type, file.size)
+      const file = e.target.files[0];
+      console.log("File selected:", file.name, file.type, file.size);
 
       // Validate file type
       if (!file.type.startsWith("image/")) {
@@ -79,8 +97,8 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
           title: "Invalid file type",
           description: "Please select an image file",
           variant: "destructive",
-        })
-        return
+        });
+        return;
       }
 
       // Validate file size (max 5MB)
@@ -89,72 +107,74 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
           title: "File too large",
           description: "Image must be less than 5MB",
           variant: "destructive",
-        })
-        return
+        });
+        return;
       }
 
-      setProductImage(file)
-      console.log("Product image set")
+      setProductImage(file);
+      console.log("Product image set");
 
       // Update form value
-      form.setValue("image", file)
+      form.setValue("image", file);
 
       // Create preview URL
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-        console.log("Image preview set")
-      }
-      reader.readAsDataURL(file)
+        setImagePreview(reader.result as string);
+        console.log("Image preview set");
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   // Trigger file input click
   const handleUploadClick = () => {
-    console.log("Upload button clicked")
-    fileInputRef.current?.click()
-  }
+    console.log("Upload button clicked");
+    fileInputRef.current?.click();
+  };
 
   // Update the onSubmit function to use categoryIds
   const onSubmit = async (data: ProductFormUIValues) => {
-    console.log("Form submitted with data:", data)
+    console.log("Form submitted with data:", data);
     try {
-      setIsSubmitting(true)
-      console.log("Setting isSubmitting to true")
+      setIsSubmitting(true);
+      console.log("Setting isSubmitting to true");
 
       // Prepare the data for the backend
-      let imageUrl = product.imageUrl
+      let imageUrl = product.imageUrl;
 
       // If a new image was uploaded, process it
       if (productImage) {
-        console.log("Uploading new image...")
+        console.log("Uploading new image...");
         try {
           // Generate a key for the file using product name and timestamp
-          const productName = data.name.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()
-          const key = `products/${Date.now()}-${productName}`
+          const productName = data.name
+            .replace(/[^a-zA-Z0-9]/g, "_")
+            .toLowerCase();
+          const key = `products/${Date.now()}-${productName}`;
 
-          const uploadedUrl = await uploadFile(productImage, key)
+          const uploadedUrl = await uploadFile(productImage, key);
 
           if (!uploadedUrl) {
-            throw new Error("Failed to get image URL from upload")
+            throw new Error("Failed to get image URL from upload");
           }
 
-          imageUrl = uploadedUrl
-          console.log("New image uploaded successfully, URL:", imageUrl)
+          imageUrl = uploadedUrl;
+          console.log("New image uploaded successfully, URL:", imageUrl);
 
           toast({
             title: "Image uploaded",
             description: "Image uploaded successfully",
-          })
+          });
         } catch (error) {
-          console.error("Error uploading image:", error)
+          console.error("Error uploading image:", error);
           toast({
             title: "Upload failed",
             description: "Failed to upload product image. Please try again.",
             variant: "destructive",
-          })
-          setIsSubmitting(false)
-          return
+          });
+          setIsSubmitting(false);
+          return;
         }
       }
 
@@ -165,28 +185,28 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
         price: Math.round(data.price * 100), // Convert to cents
         stock: data.stock,
         imageUrl: imageUrl,
-      }
+      };
 
-      console.log("Submitting product data to backend:", productData)
+      console.log("Submitting product data to backend:", productData);
 
       // Submit the data - use PUT method for updates
-      submit(productData, { method: "put", encType: "application/json" })
-      console.log("submit() function called with PUT method")
+      submit(productData, { method: "put", encType: "application/json" });
+      console.log("submit() function called with PUT method");
 
       toast({
         title: "Updating product",
         description: "Your product is being updated...",
-      })
+      });
     } catch (error) {
-      console.error("Error updating product:", error)
+      console.error("Error updating product:", error);
       toast({
         title: "Error",
         description: "Failed to update product. Please try again.",
         variant: "destructive",
-      })
-      setIsSubmitting(false)
+      });
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-[#f0faf5] p-6 md:p-10 lg:p-20 pt-40">
@@ -212,7 +232,11 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
           </CardHeader>
           <CardContent className="p-6">
             <RHFFormProvider {...form}>
-              <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <form
+                ref={formRef}
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   {/* Left column - Main product info */}
                   <div className="lg:col-span-2 space-y-6">
@@ -221,9 +245,15 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-base font-medium">Product Name</FormLabel>
+                          <FormLabel className="text-base font-medium">
+                            Product Name
+                          </FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="Enter product name" className="h-11" />
+                            <Input
+                              {...field}
+                              placeholder="Enter product name"
+                              className="h-11"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -235,7 +265,9 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
                       name="description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-base font-medium">Description</FormLabel>
+                          <FormLabel className="text-base font-medium">
+                            Description
+                          </FormLabel>
                           <FormControl>
                             <Textarea
                               {...field}
@@ -254,8 +286,13 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
                         name="categoryIds"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-base font-medium">Category</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormLabel className="text-base font-medium">
+                              Category
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
                               <FormControl>
                                 <SelectTrigger className="h-11">
                                   <SelectValue placeholder="Select a category" />
@@ -263,7 +300,9 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
                               </FormControl>
                               <SelectContent>
                                 {categories.length === 0 ? (
-                                  <SelectItem value="uncategorized">Uncategorized</SelectItem>
+                                  <SelectItem value="uncategorized">
+                                    Uncategorized
+                                  </SelectItem>
                                 ) : (
                                   categories.map((cat) => (
                                     <SelectItem key={cat.id} value={cat.id}>
@@ -283,16 +322,24 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
                         name="price"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-base font-medium">Price</FormLabel>
+                            <FormLabel className="text-base font-medium">
+                              Price
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                                  $
+                                </span>
                                 <Input
                                   {...field}
                                   type="number"
                                   step="0.01"
                                   className="pl-8 h-11"
-                                  onChange={(e) => field.onChange(Number.parseFloat(e.target.value))}
+                                  onChange={(e) =>
+                                    field.onChange(
+                                      Number.parseFloat(e.target.value),
+                                    )
+                                  }
                                   placeholder="0.00"
                                 />
                               </div>
@@ -307,14 +354,20 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
                         name="stock"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-base font-medium">Stock Quantity</FormLabel>
+                            <FormLabel className="text-base font-medium">
+                              Stock Quantity
+                            </FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
                                 type="number"
                                 className="h-11"
                                 placeholder="Enter available quantity"
-                                onChange={(e) => field.onChange(Number.parseInt(e.target.value, 10))}
+                                onChange={(e) =>
+                                  field.onChange(
+                                    Number.parseInt(e.target.value, 10),
+                                  )
+                                }
                               />
                             </FormControl>
                             <FormMessage />
@@ -326,7 +379,9 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
 
                   {/* Right column - Image upload */}
                   <div className="lg:col-span-1">
-                    <FormLabel className="text-base font-medium block mb-2">Product Image</FormLabel>
+                    <FormLabel className="text-base font-medium block mb-2">
+                      Product Image
+                    </FormLabel>
                     <div className="border-2 border-dashed border-gray-300 rounded-lg overflow-hidden">
                       <div className="relative">
                         {imagePreview ? (
@@ -353,7 +408,9 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
                                 />
                               </svg>
                             </div>
-                            <p className="text-sm text-gray-500 text-center">Upload a product image</p>
+                            <p className="text-sm text-gray-500 text-center">
+                              Upload a product image
+                            </p>
                           </div>
                         )}
 
@@ -377,7 +434,8 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
                       </div>
                     </div>
                     <p className="text-xs text-gray-500 mt-2">
-                      Recommended: 1200 x 1200px. Max size: 5MB. Formats: JPG, PNG, GIF
+                      Recommended: 1200 x 1200px. Max size: 5MB. Formats: JPG,
+                      PNG, GIF
                     </p>
                   </div>
                 </div>
@@ -389,7 +447,11 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
                       Cancel
                     </Button>
                   </Link>
-                  <Button type="submit" className="bg-emerald-500 hover:bg-emerald-600 px-6" disabled={isSubmitting}>
+                  <Button
+                    type="submit"
+                    className="bg-emerald-500 hover:bg-emerald-600 px-6"
+                    disabled={isSubmitting}
+                  >
                     <Save className="mr-2 h-4 w-4" />
                     {isSubmitting ? "Saving..." : "Save Changes"}
                   </Button>
@@ -400,5 +462,5 @@ export default function ProductEditModule({ product, categories = [] }: ProductE
         </Card>
       </div>
     </div>
-  )
+  );
 }

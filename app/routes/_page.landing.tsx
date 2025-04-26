@@ -8,7 +8,8 @@ const LandingPage = () => {
       <div className="flex flex-col items-center text-center p-8">
         <h1 className="text-5xl font-bold mb-4">Selamat Datang di Kacawmart</h1>
         <p className="text-lg mb-6">
-          Solusi lengkap untuk segala kebutuhan Anda! Temukan produk berkualitas dengan harga terbaik.
+          Solusi lengkap untuk segala kebutuhan Anda! Temukan produk berkualitas
+          dengan harga terbaik.
         </p>
         <div className="flex space-x-4">
           <Link to="/shop">
@@ -25,16 +26,31 @@ const LandingPage = () => {
       </div>
 
       {/* Gambar Produk */}
-      <div className="w-full h-80 bg-cover bg-center mt-10" style={{ backgroundImage: 'url("/path-to-your-image.jpg")' }}></div>
+      <div
+        className="w-full h-80 bg-cover bg-center mt-10"
+        style={{ backgroundImage: 'url("/path-to-your-image.jpg")' }}
+      ></div>
 
       {/* Happy Customers */}
       <div className="mt-10 text-center">
         <p className="text-xl">10,000+ Pelanggan Puas</p>
         <div className="flex justify-center space-x-2 mt-4">
           {/* Add some profile pictures of happy customers */}
-          <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="happy customer" className="w-12 h-12 rounded-full" />
-          <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="happy customer" className="w-12 h-12 rounded-full" />
-          <img src="https://randomuser.me/api/portraits/men/3.jpg" alt="happy customer" className="w-12 h-12 rounded-full" />
+          <img
+            src="https://randomuser.me/api/portraits/men/1.jpg"
+            alt="happy customer"
+            className="w-12 h-12 rounded-full"
+          />
+          <img
+            src="https://randomuser.me/api/portraits/men/2.jpg"
+            alt="happy customer"
+            className="w-12 h-12 rounded-full"
+          />
+          <img
+            src="https://randomuser.me/api/portraits/men/3.jpg"
+            alt="happy customer"
+            className="w-12 h-12 rounded-full"
+          />
         </div>
       </div>
 

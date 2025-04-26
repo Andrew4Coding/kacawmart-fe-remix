@@ -1,44 +1,44 @@
-"use client"
+"use client";
 
-import { Plus, Search } from "lucide-react"
-import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
-import OrderCard from "./components/card"
-import Pagination from "./components/pagination"
-import { Link } from "@remix-run/react"
-import { useState } from "react"
+import { Plus, Search } from "lucide-react";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import OrderCard from "./components/card";
+import Pagination from "./components/pagination";
+import { Link } from "@remix-run/react";
+import { useState } from "react";
 
 interface OrderProduct {
-  id: string
-  amount: number
-  price: number
-  productId: string
+  id: string;
+  amount: number;
+  price: number;
+  productId: string;
   product: {
-    id: string
-    name: string
-    description: string
-    price: number
-    imageUrl: string
-    ratingCount: number
-    productRating: number
-    stock: number
-  } | null
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    imageUrl: string;
+    ratingCount: number;
+    productRating: number;
+    stock: number;
+  } | null;
 }
 
 interface Order {
-  id: string
-  deliveryStatus: string
-  totalPrice: number
-  totalProduct: number
-  transactionId: string
-  discountId: string | null
-  createdAt: string
-  updatedAt: string
-  product: OrderProduct[] | null
+  id: string;
+  deliveryStatus: string;
+  totalPrice: number;
+  totalProduct: number;
+  transactionId: string;
+  discountId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  product: OrderProduct[] | null;
 }
 
 export default function OrderModule({ orders }: { orders: Order[] }) {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Add additional check to prevent mapping on undefined
   if (!orders || orders.length === 0) {
@@ -51,7 +51,7 @@ export default function OrderModule({ orders }: { orders: Order[] }) {
           <p className="text-gray-500">No orders found</p>
         </div>
       </div>
-    )
+    );
   }
 
   // Filter orders based on search term
@@ -59,7 +59,7 @@ export default function OrderModule({ orders }: { orders: Order[] }) {
     (order) =>
       order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.deliveryStatus.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  );
 
   return (
     <div className="min-h-screen pt-40 p-20 space-y-10">
@@ -88,9 +88,9 @@ export default function OrderModule({ orders }: { orders: Order[] }) {
         currentPage={1}
         totalPages={Math.ceil(orders.length / 9)}
         onPageChange={(page) => {
-          console.log(`Page changed to: ${page}`)
+          console.log(`Page changed to: ${page}`);
         }}
       />
     </div>
-  )
+  );
 }

@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { useFetcher } from "@remix-run/react";
 
-export default function TopUpModal({ isOpen, onClose, walletBalance }: {
+export default function TopUpModal({
+  isOpen,
+  onClose,
+  walletBalance,
+}: {
   isOpen: boolean;
   onClose: () => void;
   walletBalance: number;
@@ -17,13 +21,13 @@ export default function TopUpModal({ isOpen, onClose, walletBalance }: {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate form
     if (!amount || !proofUrl) {
       setErrorMessage("Please fill all fields");
       return;
     }
-    
+
     try {
       // Submit the form
       fetcher.submit(
@@ -31,10 +35,10 @@ export default function TopUpModal({ isOpen, onClose, walletBalance }: {
         {
           method: "post",
           action: "/api/wallet/topup",
-          encType: "application/json"
-        }
+          encType: "application/json",
+        },
       );
-      
+
       // Immediately show success message without waiting for response
       setIsSuccess(true);
     } catch (error) {
@@ -56,8 +60,8 @@ export default function TopUpModal({ isOpen, onClose, walletBalance }: {
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Top Up KacawPay</h2>
-          <button 
-            onClick={handleClose} 
+          <button
+            onClick={handleClose}
             className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
           >
             &times;
@@ -68,13 +72,27 @@ export default function TopUpModal({ isOpen, onClose, walletBalance }: {
           <div className="text-center py-6 space-y-4">
             <div className="bg-green-50 p-4 rounded-lg border border-green-200 mb-4">
               <div className="flex items-center justify-center mb-2">
-                <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                <svg
+                  className="w-8 h-8 text-green-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
                 </svg>
               </div>
-              <h3 className="text-green-700 font-semibold text-lg mb-2">Top-up Request Successful!</h3>
+              <h3 className="text-green-700 font-semibold text-lg mb-2">
+                Top-up Request Successful!
+              </h3>
               <p className="text-green-600">
-                Successfully submitted top-up request. Please wait for the admin to approve.
+                Successfully submitted top-up request. Please wait for the admin
+                to approve.
               </p>
             </div>
             <button

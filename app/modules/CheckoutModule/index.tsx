@@ -1,38 +1,43 @@
-import { Link, useLoaderData } from "@remix-run/react"
-import { AlertCircle, CheckCircle, CreditCard, ShieldCheck } from "lucide-react"
-import { useState } from "react"
-import { toast } from "sonner"
-import { Alert, AlertDescription } from "~/components/ui/alert"
-import { Badge } from "~/components/ui/badge"
-import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardFooter } from "~/components/ui/card"
-import Image from "~/components/ui/image"
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
-import { Separator } from "~/components/ui/separator"
+import { Link, useLoaderData } from "@remix-run/react";
+import {
+  AlertCircle,
+  CheckCircle,
+  CreditCard,
+  ShieldCheck,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardFooter } from "~/components/ui/card";
+import Image from "~/components/ui/image";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { Separator } from "~/components/ui/separator";
 
 interface Product {
-  id: string
-  name: string
-  price: number
-  imageUrl: string
-  stock: number
+  id: string;
+  name: string;
+  price: number;
+  imageUrl: string;
+  stock: number;
 }
 
 interface CartProduct {
-  id: string
-  amount: number
-  price: number
-  productId: string
-  product: Product
+  id: string;
+  amount: number;
+  price: number;
+  productId: string;
+  product: Product;
 }
 
 interface CheckoutData {
-  products: CartProduct[]
-  subtotal: number
-  adminFee: number
-  shippingFee: number
-  total: number
+  products: CartProduct[];
+  subtotal: number;
+  adminFee: number;
+  shippingFee: number;
+  total: number;
 }
 
 // Format price to IDR
@@ -42,29 +47,31 @@ const formatPrice = (price: number) => {
     currency: "IDR",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(price)
-}
+  }).format(price);
+};
 
 export default function CheckoutModule() {
-  const [error, setError] = useState<string | null>(null)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [orderComplete, setOrderComplete] = useState(false)
-  const [discountCode, setDiscountCode] = useState("")
+  const [error, setError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [orderComplete, setOrderComplete] = useState(false);
+  const [discountCode, setDiscountCode] = useState("");
 
   const checkoutData: CheckoutData | null = useLoaderData();
 
   const handleApplyDiscount = () => {
     if (!discountCode.trim()) {
-      toast.error("Please enter a discount code")
-      return
+      toast.error("Please enter a discount code");
+      return;
     }
 
-    toast.success("Your discount code will be applied when you place your order.")
-  }
+    toast.success(
+      "Your discount code will be applied when you place your order.",
+    );
+  };
 
   const handleSubmitOrder = async () => {
     try {
-      setIsProcessing(true)
+      setIsProcessing(true);
 
       const response = await fetch("/api/cart/checkout", {
         method: "POST",
@@ -74,28 +81,28 @@ export default function CheckoutModule() {
         body: JSON.stringify({
           discountCode: discountCode.trim() || undefined,
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to process order")
+        throw new Error("Failed to process order");
       }
 
-      await response.json()
+      await response.json();
 
       // Show success state
-      setOrderComplete(true)
+      setOrderComplete(true);
 
-      toast.success("Order placed successfully")
+      toast.success("Order placed successfully");
     } catch (err) {
-      toast.error("Failed to process your order. Please try again.")
-      console.error("Error processing order:", err)
+      toast.error("Failed to process your order. Please try again.");
+      console.error("Error processing order:", err);
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   // Check if cart is empty
-  const isCartEmpty = checkoutData?.products?.length === 0
+  const isCartEmpty = checkoutData?.products?.length === 0;
 
   if (orderComplete) {
     return (
@@ -105,23 +112,32 @@ export default function CheckoutModule() {
             <Card className="overflow-hidden">
               <CardContent className="p-8 text-center">
                 <CheckCircle className="h-16 w-16 mx-auto text-emerald-600 mb-4" />
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  Order Confirmed!
+                </h1>
                 <p className="text-lg text-gray-600 mb-6">
-                  Thank you for your purchase. Your order has been received and is being processed.
+                  Thank you for your purchase. Your order has been received and
+                  is being processed.
                 </p>
                 <div className="bg-gray-50 p-4 rounded-lg mb-6">
                   <p className="text-sm text-gray-500">
-                    A confirmation email has been sent to your email address with the order details.
+                    A confirmation email has been sent to your email address
+                    with the order details.
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link to="/transaction">
-                    <Button variant="outline" className="border-emerald-600 text-emerald-600 hover:bg-emerald-50">
+                    <Button
+                      variant="outline"
+                      className="border-emerald-600 text-emerald-600 hover:bg-emerald-50"
+                    >
                       View Order
                     </Button>
                   </Link>
                   <Link to="/explore">
-                    <Button className="bg-emerald-600 hover:bg-emerald-700">Continue Shopping</Button>
+                    <Button className="bg-emerald-600 hover:bg-emerald-700">
+                      Continue Shopping
+                    </Button>
                   </Link>
                 </div>
               </CardContent>
@@ -129,7 +145,7 @@ export default function CheckoutModule() {
           </div>
         </section>
       </main>
-    )
+    );
   }
 
   return (
@@ -145,7 +161,8 @@ export default function CheckoutModule() {
               Complete Your <span className="text-emerald-600">Purchase</span>
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Review your order and enter your details to complete your purchase.
+              Review your order and enter your details to complete your
+              purchase.
             </p>
           </div>
         </div>
@@ -164,10 +181,16 @@ export default function CheckoutModule() {
           {isCartEmpty ? (
             <div className="text-center py-16 bg-white rounded-lg shadow-sm">
               <AlertCircle className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
-              <p className="text-gray-500 mb-6">You need to add products to your cart before checkout.</p>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Your cart is empty
+              </h2>
+              <p className="text-gray-500 mb-6">
+                You need to add products to your cart before checkout.
+              </p>
               <Link to="/cart">
-                <Button className="bg-emerald-600 hover:bg-emerald-700">Return to Cart</Button>
+                <Button className="bg-emerald-600 hover:bg-emerald-700">
+                  Return to Cart
+                </Button>
               </Link>
             </div>
           ) : (
@@ -186,8 +209,12 @@ export default function CheckoutModule() {
                         <CreditCard className="h-5 w-5 text-emerald-600" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-gray-900">E-Wallet Payment</h3>
-                        <p className="text-sm text-gray-500">You'll pay using your e-wallet</p>
+                        <h3 className="font-medium text-gray-900">
+                          E-Wallet Payment
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          You'll pay using your e-wallet
+                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -201,17 +228,27 @@ export default function CheckoutModule() {
                     </h2>
                     <div className="space-y-4">
                       {checkoutData?.products?.map((item) => (
-                        <div key={item.id} className="flex items-center space-x-4">
+                        <div
+                          key={item.id}
+                          className="flex items-center space-x-4"
+                        >
                           <div className="w-16 h-16 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
                             <Image
-                              src={item.product.imageUrl || "/placeholder.svg?height=64&width=64"}
+                              src={
+                                item.product.imageUrl ||
+                                "/placeholder.svg?height=64&width=64"
+                              }
                               alt={item.product.name}
                               className="w-full h-full object-cover"
                             />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-medium text-gray-900 truncate">{item.product.name}</h3>
-                            <p className="text-sm text-gray-500">Qty: {item.amount}</p>
+                            <h3 className="text-sm font-medium text-gray-900 truncate">
+                              {item.product.name}
+                            </h3>
+                            <p className="text-sm text-gray-500">
+                              Qty: {item.amount}
+                            </p>
                           </div>
                           <div className="text-sm font-medium text-gray-900">
                             {formatPrice(item.product.price * item.amount)}
@@ -228,19 +265,27 @@ export default function CheckoutModule() {
                 <div className="sticky top-6">
                   <Card>
                     <CardContent className="p-6">
-                      <h2 className="text-xl font-bold text-gray-900 mb-4">Order Summary</h2>
+                      <h2 className="text-xl font-bold text-gray-900 mb-4">
+                        Order Summary
+                      </h2>
                       <div className="space-y-4">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Subtotal</span>
-                          <span className="font-medium">{formatPrice(checkoutData?.subtotal || 0)}</span>
+                          <span className="font-medium">
+                            {formatPrice(checkoutData?.subtotal || 0)}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Shipping Fee</span>
-                          <span className="font-medium">{formatPrice(checkoutData?.shippingFee || 0)}</span>
+                          <span className="font-medium">
+                            {formatPrice(checkoutData?.shippingFee || 0)}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Admin Fee</span>
-                          <span className="font-medium">{formatPrice(checkoutData?.adminFee || 0)}</span>
+                          <span className="font-medium">
+                            {formatPrice(checkoutData?.adminFee || 0)}
+                          </span>
                         </div>
 
                         {/* Discount Code */}
@@ -267,7 +312,9 @@ export default function CheckoutModule() {
                         <Separator />
                         <div className="flex justify-between text-lg font-bold">
                           <span>Total</span>
-                          <span className="text-emerald-600">{formatPrice(checkoutData?.total || 0)}</span>
+                          <span className="text-emerald-600">
+                            {formatPrice(checkoutData?.total || 0)}
+                          </span>
                         </div>
                       </div>
                     </CardContent>
@@ -300,5 +347,5 @@ export default function CheckoutModule() {
         </div>
       </section>
     </main>
-  )
+  );
 }

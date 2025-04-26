@@ -10,10 +10,11 @@ import { Voucher } from "./type";
 
 export default function KacawPayModule() {
   const { wallet, vouchers } = useLoaderData<typeof loader>();
-  const [activeTab, setActiveTab] = useState('wallet');
+  const [activeTab, setActiveTab] = useState("wallet");
   const [showTopUpModal, setShowTopUpModal] = useState(false);
   const [showBuyVoucherModal, setShowBuyVoucherModal] = useState(false);
-  const [showAvailableVouchersModal, setShowAvailableVouchersModal] = useState(false);
+  const [showAvailableVouchersModal, setShowAvailableVouchersModal] =
+    useState(false);
   const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -26,34 +27,34 @@ export default function KacawPayModule() {
 
   const confirmPurchase = async () => {
     if (!selectedVoucher) return;
-    
+
     setIsProcessing(true);
-    
+
     const response = await fetch(`/api/voucher/purchase`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        Cookie: document.cookie
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Cookie: document.cookie,
       },
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify({
-        voucherId: selectedVoucher.id
-      })
-    })
+        voucherId: selectedVoucher.id,
+      }),
+    });
 
     setIsProcessing(false);
 
     if (!response.ok) {
-      return toast.error("Error!")
+      return toast.error("Error!");
     }
 
     // Tutup modal pembelian
     setShowBuyVoucherModal(false);
-    
+
     // Tampilkan modal success
     setShowSuccessModal(true);
-    
+
     // Reset selected voucher
     setSelectedVoucher(null);
   };
@@ -76,42 +77,45 @@ export default function KacawPayModule() {
   return (
     <div className="container mx-auto p-4 min-h-screen">
       <h1 className="text-2xl font-bold mb-4">KacawPay</h1>
-      
+
       {/* Tabs */}
       <div className="flex mb-4 border-b">
-        <button 
-          className={`px-4 py-2 ${activeTab === 'wallet' ? 'border-b-2 border-blue-500 font-bold' : ''}`}
-          onClick={() => setActiveTab('wallet')}
+        <button
+          className={`px-4 py-2 ${activeTab === "wallet" ? "border-b-2 border-blue-500 font-bold" : ""}`}
+          onClick={() => setActiveTab("wallet")}
         >
           My Wallet
         </button>
-        <button 
-          className={`px-4 py-2 ${activeTab === 'vouchers' ? 'border-b-2 border-blue-500 font-bold' : ''}`}
-          onClick={() => setActiveTab('vouchers')}
+        <button
+          className={`px-4 py-2 ${activeTab === "vouchers" ? "border-b-2 border-blue-500 font-bold" : ""}`}
+          onClick={() => setActiveTab("vouchers")}
         >
           My Vouchers
         </button>
       </div>
 
       {/* Wallet Tab */}
-      {activeTab === 'wallet' && (
+      {activeTab === "wallet" && (
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Wallet Balance</h2>
-            <button 
+            <button
               onClick={() => setShowTopUpModal(true)}
               className="bg-green-500 text-black px-4 py-2 rounded hover:bg-primary-dark transition"
             >
               Top Up
             </button>
           </div>
-          
+
           <div className="mt-4">
             <p className="text-3xl font-bold">
-              Rp {typeof wallet.balance === 'number' ? wallet.balance.toLocaleString('id-ID') : '0'}
+              Rp{" "}
+              {typeof wallet.balance === "number"
+                ? wallet.balance.toLocaleString("id-ID")
+                : "0"}
             </p>
           </div>
-          
+
           {wallet.lastTopUpDate && (
             <div className="mt-2 text-gray-600 text-sm">
               Last top up: {new Date(wallet.lastTopUpDate).toLocaleString()}
@@ -121,24 +125,24 @@ export default function KacawPayModule() {
       )}
 
       {/* Vouchers Tab */}
-      {activeTab === 'vouchers' && (
+      {activeTab === "vouchers" && (
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">My Vouchers</h2>
-            <button 
+            <button
               onClick={() => setShowAvailableVouchersModal(true)}
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
             >
               Buy Voucher
             </button>
           </div>
-          
+
           {voucherList.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {voucherList.map((item, index) => (
-                <VoucherCard 
-                  key={item.id || `voucher-${index}`} 
-                  voucher={item} 
+                <VoucherCard
+                  key={item.id || `voucher-${index}`}
+                  voucher={item}
                 />
               ))}
             </div>
@@ -158,8 +162,8 @@ export default function KacawPayModule() {
       )}
 
       {/* Top Up Modal */}
-      <TopUpModal 
-        isOpen={showTopUpModal} 
+      <TopUpModal
+        isOpen={showTopUpModal}
         onClose={() => setShowTopUpModal(false)}
         walletBalance={wallet.balance || 0}
       />
@@ -183,41 +187,67 @@ export default function KacawPayModule() {
         voucher={selectedVoucher}
         walletBalance={wallet.balance || 0}
       />
-      
+
       {/* Success Modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-md max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Purchase Voucher Success</h2>
-              <button 
+              <h2 className="text-xl font-semibold">
+                Purchase Voucher Success
+              </h2>
+              <button
                 onClick={() => setShowSuccessModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
                 </svg>
               </button>
             </div>
-            
+
             <div className="mb-6 flex justify-center items-center">
               <div className="bg-green-100 p-3 rounded-full">
-                <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                <svg
+                  className="w-10 h-10 text-green-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
                 </svg>
               </div>
             </div>
-            
+
             <div className="text-center mb-6">
-              <p className="text-gray-600">Your voucher has been successfully purchased!</p>
+              <p className="text-gray-600">
+                Your voucher has been successfully purchased!
+              </p>
             </div>
-            
+
             <div className="flex justify-center">
-              <button 
+              <button
                 onClick={() => {
                   setShowAvailableVouchersModal(false);
                   setShowSuccessModal(false);
-                  setActiveTab('vouchers');
+                  setActiveTab("vouchers");
                 }}
                 className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition"
               >

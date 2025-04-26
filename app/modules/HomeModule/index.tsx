@@ -82,9 +82,7 @@ export default function HomeModule() {
                 <h3 className="font-medium text-gray-900 mb-2">
                   {product.nama}
                 </h3>
-                <p className="text-emerald-600 font-bold">
-                  Rp {product.harga}
-                </p>
+                <p className="text-emerald-600 font-bold">Rp {product.harga}</p>
               </div>
             ))}
           </div>

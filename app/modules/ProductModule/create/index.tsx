@@ -1,58 +1,73 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useRef, useEffect } from "react"
-import { Link, useSubmit } from "@remix-run/react"
-import { Save, Camera } from "lucide-react"
-import { toast } from "~/components/ui/use-toast"
+import type React from "react";
+import { useState, useRef, useEffect } from "react";
+import { Link, useSubmit } from "@remix-run/react";
+import { Save, Camera } from "lucide-react";
+import { toast } from "~/components/ui/use-toast";
 
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form"
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, FormProvider as RHFFormProvider } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, FormProvider as RHFFormProvider } from "react-hook-form";
 
-import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
-import { Textarea } from "~/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
 // Import the updated schemas
-import { type ProductFormUIValues, productFormSchema } from "../type"
-import { uploadFile } from "~/lib/file" // Import the existing uploadFile function
+import { type ProductFormUIValues, productFormSchema } from "../type";
+import { uploadFile } from "~/lib/file"; // Import the existing uploadFile function
 
 // Replace useLayoutEffect with useEffect for SSR compatibility
-const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useEffect : useEffect
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useEffect : useEffect;
 
 type Category = {
-  id: string
-  name: string
-}
+  id: string;
+  name: string;
+};
 
 interface ProductCreateModuleProps {
-  categories: Category[]
+  categories: Category[];
 }
 
-export default function ProductCreateModule({ categories = [] }: ProductCreateModuleProps) {
-  console.log("ProductCreateModule rendered with categories:", categories)
+export default function ProductCreateModule({
+  categories = [],
+}: ProductCreateModuleProps) {
+  console.log("ProductCreateModule rendered with categories:", categories);
 
   // Add a state to track if we're on the client
-  const [isClient, setIsClient] = useState(false)
+  const [isClient, setIsClient] = useState(false);
 
   // Use useEffect to set isClient to true after mount
   useEffect(() => {
-    setIsClient(true)
-    console.log("Component mounted on client")
-  }, [])
+    setIsClient(true);
+    console.log("Component mounted on client");
+  }, []);
 
   // State for product image
-  const [productImage, setProductImage] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [debugData, setDebugData] = useState<any>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const formRef = useRef<HTMLFormElement>(null)
-  const submit = useSubmit()
+  const [productImage, setProductImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [debugData, setDebugData] = useState<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const submit = useSubmit();
 
   // Update the form default values to use categoryIds instead of category
   const form = useForm<ProductFormUIValues>({
@@ -65,22 +80,22 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
       stock: 0,
       image: null,
     },
-  })
+  });
 
   // Log form values on change for debugging
   useEffect(() => {
     const subscription = form.watch((value) => {
-      console.log("Form values changed:", value)
-    })
-    return () => subscription.unsubscribe()
-  }, [form])
+      console.log("Form values changed:", value);
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("File input changed")
+    console.log("File input changed");
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
-      console.log("File selected:", file.name, file.type, file.size)
+      const file = e.target.files[0];
+      console.log("File selected:", file.name, file.type, file.size);
 
       // Validate file type
       if (!file.type.startsWith("image/")) {
@@ -88,8 +103,8 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
           title: "Invalid file type",
           description: "Please select an image file",
           variant: "destructive",
-        })
-        return
+        });
+        return;
       }
 
       // Validate file size (max 5MB)
@@ -98,78 +113,78 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
           title: "File too large",
           description: "Image must be less than 5MB",
           variant: "destructive",
-        })
-        return
+        });
+        return;
       }
 
-      setProductImage(file)
-      console.log("Product image set")
+      setProductImage(file);
+      console.log("Product image set");
 
       // Update form value
-      form.setValue("image", file)
+      form.setValue("image", file);
 
       // Create preview URL
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-        console.log("Image preview set")
-      }
-      reader.readAsDataURL(file)
+        setImagePreview(reader.result as string);
+        console.log("Image preview set");
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   // Trigger file input click
   const handleUploadClick = () => {
-    console.log("Upload button clicked")
-    fileInputRef.current?.click()
-  }
+    console.log("Upload button clicked");
+    fileInputRef.current?.click();
+  };
 
   // Direct form submission for debugging
   const handleDirectSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
-    console.log("Direct form submission triggered")
+    event.preventDefault();
+    console.log("Direct form submission triggered");
 
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
 
       if (!productImage) {
-        console.error("No product image selected")
+        console.error("No product image selected");
         toast({
           title: "Image required",
           description: "Please upload a product image",
           variant: "destructive",
-        })
-        setIsSubmitting(false)
-        return
+        });
+        setIsSubmitting(false);
+        return;
       }
 
       // Generate a key for the file using product name and timestamp
       const productName = form
         .getValues("name")
         .replace(/[^a-zA-Z0-9]/g, "_")
-        .toLowerCase()
-      const key = `products/${Date.now()}-${productName}`
+        .toLowerCase();
+      const key = `products/${Date.now()}-${productName}`;
 
       // First upload the image to get a URL using the existing uploadFile function
-      console.log("Uploading image for debug submission...")
-      let imageUrl
+      console.log("Uploading image for debug submission...");
+      let imageUrl;
       try {
-        imageUrl = await uploadFile(productImage, key)
+        imageUrl = await uploadFile(productImage, key);
 
         if (!imageUrl) {
-          throw new Error("Failed to get image URL from upload")
+          throw new Error("Failed to get image URL from upload");
         }
 
-        console.log("Debug: Image uploaded successfully, URL:", imageUrl)
+        console.log("Debug: Image uploaded successfully, URL:", imageUrl);
       } catch (error) {
-        console.error("Debug: Error uploading image:", error)
+        console.error("Debug: Error uploading image:", error);
         toast({
           title: "Upload failed",
           description: "Failed to upload product image",
           variant: "destructive",
-        })
-        setIsSubmitting(false)
-        return
+        });
+        setIsSubmitting(false);
+        return;
       }
 
       // Now prepare the data with imageUrl instead of the file
@@ -180,9 +195,9 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
         price: Math.round(form.getValues("price") * 100),
         stock: Number(form.getValues("stock")),
         imageUrl: imageUrl, // Use the URL instead of the file
-      }
+      };
 
-      console.log("Debug: Prepared product data:", productData)
+      console.log("Debug: Prepared product data:", productData);
 
       // Make a direct fetch request for debugging
       const response = await fetch("/api/product/debug-create", {
@@ -191,75 +206,75 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
           "Content-Type": "application/json",
         },
         body: JSON.stringify(productData),
-      })
+      });
 
-      const result = await response.json()
-      console.log("Direct submission response:", result)
-      setDebugData(result)
+      const result = await response.json();
+      console.log("Direct submission response:", result);
+      setDebugData(result);
 
       toast({
         title: "Debug info",
         description: "Check console for submission details",
-      })
+      });
     } catch (error) {
-      console.error("Error in direct submission:", error)
+      console.error("Error in direct submission:", error);
       toast({
         title: "Error",
         description: "Failed to submit form. See console for details.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   // Update the onSubmit function to use categoryIds
   const onSubmit = async (data: ProductFormUIValues) => {
-    console.log("Form submitted with data:", data)
+    console.log("Form submitted with data:", data);
     try {
-      setIsSubmitting(true)
-      console.log("Setting isSubmitting to true")
+      setIsSubmitting(true);
+      console.log("Setting isSubmitting to true");
 
       if (!productImage) {
-        console.error("No product image selected")
+        console.error("No product image selected");
         toast({
           title: "Image required",
           description: "Please upload a product image",
           variant: "destructive",
-        })
-        setIsSubmitting(false)
-        return
+        });
+        setIsSubmitting(false);
+        return;
       }
 
       // Generate a key for the file using product name and timestamp
-      const productName = data.name.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase()
-      const key = `products/${Date.now()}-${productName}`
+      const productName = data.name.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
+      const key = `products/${Date.now()}-${productName}`;
 
-      console.log("Uploading image...")
+      console.log("Uploading image...");
       // First upload the image using the existing uploadFile function
-      let imageUrl
+      let imageUrl;
       try {
-        imageUrl = await uploadFile(productImage, key)
+        imageUrl = await uploadFile(productImage, key);
 
         if (!imageUrl) {
-          throw new Error("Failed to get image URL from upload")
+          throw new Error("Failed to get image URL from upload");
         }
 
-        console.log("Image uploaded successfully, URL:", imageUrl)
+        console.log("Image uploaded successfully, URL:", imageUrl);
 
         toast({
           title: "Image uploaded",
           description: "Image uploaded successfully",
-        })
+        });
       } catch (error) {
-        console.error("Error uploading image:", error)
+        console.error("Error uploading image:", error);
         toast({
           title: "Upload failed",
           description: "Failed to upload product image. Please try again.",
           variant: "destructive",
-        })
-        setIsSubmitting(false)
-        return
+        });
+        setIsSubmitting(false);
+        return;
       }
 
       // Then prepare the data for the backend
@@ -270,28 +285,28 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
         price: Math.round(data.price * 100), // Convert to cents
         stock: data.stock,
         imageUrl: imageUrl, // Use the URL instead of the file
-      }
+      };
 
-      console.log("Submitting product data to backend:", productData)
+      console.log("Submitting product data to backend:", productData);
 
       // Submit the data
-      submit(productData, { method: "post", encType: "application/json" })
-      console.log("submit() function called")
+      submit(productData, { method: "post", encType: "application/json" });
+      console.log("submit() function called");
 
       toast({
         title: "Creating product",
         description: "Your product is being created...",
-      })
+      });
     } catch (error) {
-      console.error("Error creating product:", error)
+      console.error("Error creating product:", error);
       toast({
         title: "Error",
         description: "Failed to create product. Please try again.",
         variant: "destructive",
-      })
-      setIsSubmitting(false)
+      });
+      setIsSubmitting(false);
     }
-  }
+  };
 
   // If we're not on the client yet, render a simple loading state
   if (!isClient) {
@@ -304,7 +319,7 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -331,7 +346,11 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
           </CardHeader>
           <CardContent className="p-6">
             <RHFFormProvider {...form}>
-              <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <form
+                ref={formRef}
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   {/* Left column - Main product info */}
                   <div className="lg:col-span-2 space-y-6">
@@ -340,9 +359,15 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-base font-medium">Product Name</FormLabel>
+                          <FormLabel className="text-base font-medium">
+                            Product Name
+                          </FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="Enter product name" className="h-11" />
+                            <Input
+                              {...field}
+                              placeholder="Enter product name"
+                              className="h-11"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -354,7 +379,9 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
                       name="description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-base font-medium">Description</FormLabel>
+                          <FormLabel className="text-base font-medium">
+                            Description
+                          </FormLabel>
                           <FormControl>
                             <Textarea
                               {...field}
@@ -374,8 +401,13 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
                         name="categoryIds"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-base font-medium">Category</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormLabel className="text-base font-medium">
+                              Category
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
                               <FormControl>
                                 <SelectTrigger className="h-11">
                                   <SelectValue placeholder="Select a category" />
@@ -383,7 +415,9 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
                               </FormControl>
                               <SelectContent>
                                 {categories.length === 0 ? (
-                                  <SelectItem value="uncategorized">Uncategorized</SelectItem>
+                                  <SelectItem value="uncategorized">
+                                    Uncategorized
+                                  </SelectItem>
                                 ) : (
                                   categories.map((cat) => (
                                     <SelectItem key={cat.id} value={cat.id}>
@@ -403,16 +437,24 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
                         name="price"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-base font-medium">Price</FormLabel>
+                            <FormLabel className="text-base font-medium">
+                              Price
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                                  $
+                                </span>
                                 <Input
                                   {...field}
                                   type="number"
                                   step="0.01"
                                   className="pl-8 h-11"
-                                  onChange={(e) => field.onChange(Number.parseFloat(e.target.value))}
+                                  onChange={(e) =>
+                                    field.onChange(
+                                      Number.parseFloat(e.target.value),
+                                    )
+                                  }
                                   placeholder="0.00"
                                 />
                               </div>
@@ -427,14 +469,20 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
                         name="stock"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-base font-medium">Stock Quantity</FormLabel>
+                            <FormLabel className="text-base font-medium">
+                              Stock Quantity
+                            </FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
                                 type="number"
                                 className="h-11"
                                 placeholder="Enter available quantity"
-                                onChange={(e) => field.onChange(Number.parseInt(e.target.value, 10))}
+                                onChange={(e) =>
+                                  field.onChange(
+                                    Number.parseInt(e.target.value, 10),
+                                  )
+                                }
                               />
                             </FormControl>
                             <FormMessage />
@@ -446,7 +494,9 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
 
                   {/* Right column - Image upload */}
                   <div className="lg:col-span-1">
-                    <FormLabel className="text-base font-medium block mb-2">Product Image</FormLabel>
+                    <FormLabel className="text-base font-medium block mb-2">
+                      Product Image
+                    </FormLabel>
                     <div className="border-2 border-dashed border-gray-300 rounded-lg overflow-hidden">
                       <div className="relative">
                         {imagePreview ? (
@@ -473,7 +523,9 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
                                 />
                               </svg>
                             </div>
-                            <p className="text-sm text-gray-500 text-center">Upload a product image</p>
+                            <p className="text-sm text-gray-500 text-center">
+                              Upload a product image
+                            </p>
                           </div>
                         )}
 
@@ -497,7 +549,8 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
                       </div>
                     </div>
                     <p className="text-xs text-gray-500 mt-2">
-                      Recommended: 1200 x 1200px. Max size: 5MB. Formats: JPG, PNG, GIF
+                      Recommended: 1200 x 1200px. Max size: 5MB. Formats: JPG,
+                      PNG, GIF
                     </p>
                   </div>
                 </div>
@@ -509,7 +562,11 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
                       Cancel
                     </Button>
                   </Link>
-                  <Button type="submit" className="bg-emerald-500 hover:bg-emerald-600 px-6" disabled={isSubmitting}>
+                  <Button
+                    type="submit"
+                    className="bg-emerald-500 hover:bg-emerald-600 px-6"
+                    disabled={isSubmitting}
+                  >
                     <Save className="mr-2 h-4 w-4" />
                     {isSubmitting ? "Creating..." : "Create Product"}
                   </Button>
@@ -530,5 +587,5 @@ export default function ProductCreateModule({ categories = [] }: ProductCreateMo
         )}
       </div>
     </div>
-  )
+  );
 }

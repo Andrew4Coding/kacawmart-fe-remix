@@ -14,24 +14,22 @@ export const topUpAction: ActionFunction = async ({ request }) => {
     }
 
     // Create a new request for fetchServer with the correct URL and method
-    const response = await fetchServer(
-      request, 
-      "/api/wallet/topup", 
-      {
-        method: 'POST',
-        body: JSON.stringify({ amount: Number(amount), proofUrl })
-      }
-    );
-    
+    const response = await fetchServer(request, "/api/wallet/topup", {
+      method: "POST",
+      body: JSON.stringify({ amount: Number(amount), proofUrl }),
+    });
+
     return response;
   } catch (error) {
     console.error("Top-up error:", error);
-    return json({ 
-      success: false,
-      error: error instanceof Error 
-        ? error.message 
-        : "Failed to process top up" 
-    }, 500);
+    return json(
+      {
+        success: false,
+        error:
+          error instanceof Error ? error.message : "Failed to process top up",
+      },
+      500,
+    );
   }
 };
 
@@ -47,25 +45,25 @@ export const buyVoucherAction: ActionFunction = async ({ request }) => {
 
     const body = JSON.stringify({ voucherId });
 
-    const response = await fetchServer(
-      request,
-      "/api/vouchers/purchase",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body
-      }
-    );
+    const response = await fetchServer(request, "/api/vouchers/purchase", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body,
+    });
 
     return response;
   } catch (error) {
     console.error("Voucher purchase error:", error);
-    return json({
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to purchase voucher"
-    }, 500);
+    return json(
+      {
+        success: false,
+        error:
+          error instanceof Error ? error.message : "Failed to purchase voucher",
+      },
+      500,
+    );
   }
 };

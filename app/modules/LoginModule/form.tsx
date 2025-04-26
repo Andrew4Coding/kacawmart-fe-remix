@@ -1,160 +1,181 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
-import { Link } from "@remix-run/react"
-import { AlertCircle, KeyRound, Mail } from "lucide-react"
-import { toast } from "sonner"
-import { Alert, AlertDescription } from "~/components/ui/alert"
-import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "~/components/ui/form"
-import { Input } from "~/components/ui/input"
-import { cn } from "~/lib/utils"
-import { getServerAuthClient } from "~/lib/auth-client"
+import { Link } from "@remix-run/react";
+import { AlertCircle, KeyRound, Mail } from "lucide-react";
+import { toast } from "sonner";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
+import { cn } from "~/lib/utils";
+import { getServerAuthClient } from "~/lib/auth-client";
 
 const loginSchema = z.object({
-    username: z.string().min(1, "Email or username is required"),
-    password: z.string().min(1, "Password is required"),
-})
+  username: z.string().min(1, "Email or username is required"),
+  password: z.string().min(1, "Password is required"),
+});
 
-type LoginFormValues = z.infer<typeof loginSchema>
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-    const [error, setError] = useState<string | null>(null)
-    const [isLoading, setIsLoading] = useState(false)
-    const authClient = getServerAuthClient();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const authClient = getServerAuthClient();
 
-    const form = useForm<LoginFormValues>({
-        resolver: zodResolver(loginSchema),
-        defaultValues: {
-            username: "",
-            password: "",
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
+
+  async function onSubmit(data: LoginFormValues) {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await authClient.signIn.email(
+        {
+          email: data.username,
+          password: data.password,
+          callbackURL: "/",
+          rememberMe: true,
         },
-    })
-
-    async function onSubmit(data: LoginFormValues) {
-        setIsLoading(true)
-        setError(null)
-
-        try {
-            await authClient.signIn.email({
-                email: data.username,
-                password: data.password,
-                callbackURL: '/',
-                rememberMe: true,
-            }, {
-                onSuccess: () => {
-                    toast.success("Login successful");
-                },
-                onError: (ctx) => {
-                    toast.error(ctx.error.message);
-                    setError(ctx.error.message);
-                },
-            })
-        } catch (err) {
-            const message = err instanceof Error ? err.message : "Failed to login"
-            toast.error(message)
-            setError(message)
-        } finally {
-            setIsLoading(false)
-        }
+        {
+          onSuccess: () => {
+            toast.success("Login successful");
+          },
+          onError: (ctx) => {
+            toast.error(ctx.error.message);
+            setError(ctx.error.message);
+          },
+        },
+      );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to login";
+      toast.error(message);
+      setError(message);
+    } finally {
+      setIsLoading(false);
     }
+  }
 
-    return (
-        <div className="w-full max-w-md font-open">
-            <Card className="border-none shadow-xl">
-                <CardHeader className="space-y-1">
-                    <CardTitle className="text-center text-2xl font-bold">Welcome back</CardTitle>
-                    <CardDescription className="text-center text-sm text-muted-foreground">
-                        Enter your credentials to access your account
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="p-6">
-                    {error && (
-                        <Alert variant="destructive" className="mb-6 animate-in fade-in-50">
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertDescription>{error}</AlertDescription>
-                        </Alert>
-                    )}
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-                            <FormField
-                                control={form.control}
-                                name="username"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-sm font-medium">Email or Username</FormLabel>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                                                <Input
-                                                    placeholder="Enter your email or username"
-                                                    className={cn(
-                                                        "pl-10 transition-all focus-visible:ring-2 focus-visible:ring-offset-1",
-                                                        form.formState.errors.username && "focus-visible:ring-destructive",
-                                                    )}
-                                                    {...field}
-                                                />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <div className="flex items-center justify-between">
-                                            <FormLabel className="text-sm font-medium">Password</FormLabel>
-                                            <Link
-                                                to="/forgot-password"
-                                                className="text-xs text-slate-500 hover:text-slate-800 hover:underline"
-                                            >
-                                                Forgot password?
-                                            </Link>
-                                        </div>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <KeyRound className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                                                <Input
-                                                    type="password"
-                                                    placeholder="••••••••"
-                                                    className={cn(
-                                                        "pl-10 transition-all focus-visible:ring-2 focus-visible:ring-offset-1",
-                                                        form.formState.errors.password && "focus-visible:ring-destructive",
-                                                    )}
-                                                    {...field}
-                                                />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <Button
-                                type="submit"
-                                className="w-full"
-                                disabled={isLoading}
-                            >
-                                {isLoading ? (
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-200 border-t-slate-200/20"></div>
-                                        <span>Logging in...</span>
-                                    </div>
-                                ) : (
-                                    "Sign in"
-                                )}
-                            </Button>
-                        </form>
-                    </Form>
+  return (
+    <div className="w-full max-w-md font-open">
+      <Card className="border-none shadow-xl">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-center text-2xl font-bold">
+            Welcome back
+          </CardTitle>
+          <CardDescription className="text-center text-sm text-muted-foreground">
+            Enter your credentials to access your account
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-6">
+          {error && (
+            <Alert variant="destructive" className="mb-6 animate-in fade-in-50">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      Email or Username
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                        <Input
+                          placeholder="Enter your email or username"
+                          className={cn(
+                            "pl-10 transition-all focus-visible:ring-2 focus-visible:ring-offset-1",
+                            form.formState.errors.username &&
+                              "focus-visible:ring-destructive",
+                          )}
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel className="text-sm font-medium">
+                        Password
+                      </FormLabel>
+                      <Link
+                        to="/forgot-password"
+                        className="text-xs text-slate-500 hover:text-slate-800 hover:underline"
+                      >
+                        Forgot password?
+                      </Link>
+                    </div>
+                    <FormControl>
+                      <div className="relative">
+                        <KeyRound className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          className={cn(
+                            "pl-10 transition-all focus-visible:ring-2 focus-visible:ring-offset-1",
+                            form.formState.errors.password &&
+                              "focus-visible:ring-destructive",
+                          )}
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-200 border-t-slate-200/20"></div>
+                    <span>Logging in...</span>
+                  </div>
+                ) : (
+                  "Sign in"
+                )}
+              </Button>
+            </form>
+          </Form>
 
-                    {/* <div className="mt-6">
+          {/* <div className="mt-6">
                         <div className="relative">
                             <div className="absolute inset-0 flex items-center">
                                 <Separator className="w-full" />
@@ -198,26 +219,32 @@ export function LoginForm() {
                             </Button>
                         </div>
                     </div> */}
-                </CardContent>
-                <CardFooter className="flex flex-col items-center justify-center border-t p-6">
-                    <p className="text-sm text-muted-foreground">
-                        Don't have an account?{" "}
-                        <Link to="/register" className="font-medium text-slate-900 hover:underline">
-                            Create an account
-                        </Link>
-                    </p>
-                    <p className="mt-2 text-xs text-slate-500">
-                        By continuing, you agree to our{" "}
-                        <Link to="/terms" className="hover:text-slate-800 hover:underline">
-                            Terms of Service
-                        </Link>{" "}
-                        and{" "}
-                        <Link to="/privacy" className="hover:text-slate-800 hover:underline">
-                            Privacy Policy
-                        </Link>
-                    </p>
-                </CardFooter>
-            </Card>
-        </div>
-    )
+        </CardContent>
+        <CardFooter className="flex flex-col items-center justify-center border-t p-6">
+          <p className="text-sm text-muted-foreground">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="font-medium text-slate-900 hover:underline"
+            >
+              Create an account
+            </Link>
+          </p>
+          <p className="mt-2 text-xs text-slate-500">
+            By continuing, you agree to our{" "}
+            <Link to="/terms" className="hover:text-slate-800 hover:underline">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link
+              to="/privacy"
+              className="hover:text-slate-800 hover:underline"
+            >
+              Privacy Policy
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
+    </div>
+  );
 }

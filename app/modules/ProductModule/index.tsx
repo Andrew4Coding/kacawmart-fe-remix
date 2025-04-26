@@ -1,32 +1,38 @@
-"use client"
+"use client";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
-import { Plus, Search } from "lucide-react"
-import { Link, useNavigate } from "@remix-run/react"
-import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
-import type { Product } from "~/lib/types"
-import ProductCard from "./components/card"
-import Pagination from "./components/pagination"
-import { useState, useEffect } from "react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Plus, Search } from "lucide-react";
+import { Link, useNavigate } from "@remix-run/react";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import type { Product } from "~/lib/types";
+import ProductCard from "./components/card";
+import Pagination from "./components/pagination";
+import { useState, useEffect } from "react";
 
 export default function ProductModule({
   products,
   categories,
   selectedCategoryId,
 }: {
-  products: Product[]
-  categories: { id: string; name: string }[]
-  selectedCategoryId: string | null
+  products: Product[];
+  categories: { id: string; name: string }[];
+  selectedCategoryId: string | null;
 }) {
-  const navigate = useNavigate()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products)
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
 
   // Log props to help debug
-  console.log("Products:", products)
-  console.log("Categories:", categories)
-  console.log("Selected Category ID:", selectedCategoryId)
+  console.log("Products:", products);
+  console.log("Categories:", categories);
+  console.log("Selected Category ID:", selectedCategoryId);
 
   // Filter products based on search query
   useEffect(() => {
@@ -34,24 +40,27 @@ export default function ProductModule({
       const matchesSearch =
         searchQuery === "" ||
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()))
+        (product.description &&
+          product.description
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()));
 
-      return matchesSearch
-    })
+      return matchesSearch;
+    });
 
-    setFilteredProducts(filtered)
-  }, [searchQuery, products])
+    setFilteredProducts(filtered);
+  }, [searchQuery, products]);
 
   // Handle category change - simple approach using direct navigation
   const handleCategoryChange = (categoryId: string) => {
     if (categoryId === "all") {
       // Navigate to the base URL without category filter
-      navigate(`/products`)
+      navigate(`/products`);
     } else {
       // Navigate with the category filter
-      navigate(`/products?categoryId=${categoryId}`)
+      navigate(`/products?categoryId=${categoryId}`);
     }
-  }
+  };
 
   // If products array is undefined or not an array, show a message
   if (!Array.isArray(products)) {
@@ -60,7 +69,7 @@ export default function ProductModule({
         <p>Error: Products data is not in the expected format</p>
         <pre>{JSON.stringify(products, null, 2)}</pre>
       </div>
-    )
+    );
   }
 
   // If no products, show a message
@@ -72,7 +81,7 @@ export default function ProductModule({
           Clear Filters
         </Button>
       </div>
-    )
+    );
   }
 
   return (
@@ -105,7 +114,10 @@ export default function ProductModule({
         </div>
 
         <div className="w-full md:w-48">
-          <Select value={selectedCategoryId || "all"} onValueChange={handleCategoryChange}>
+          <Select
+            value={selectedCategoryId || "all"}
+            onValueChange={handleCategoryChange}
+          >
             <SelectTrigger>
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
@@ -129,11 +141,13 @@ export default function ProductModule({
       {/* Products Grid */}
       {filteredProducts.length === 0 ? (
         <div className="text-center py-16">
-          <div className="text-gray-500 mb-4">No products found matching your criteria.</div>
+          <div className="text-gray-500 mb-4">
+            No products found matching your criteria.
+          </div>
           <Button
             onClick={() => {
-              setSearchQuery("")
-              navigate("/products")
+              setSearchQuery("");
+              navigate("/products");
             }}
             variant="outline"
           >
@@ -152,9 +166,9 @@ export default function ProductModule({
         currentPage={1}
         totalPages={10}
         onPageChange={(page) => {
-          console.log(`Page changed to: ${page}`)
+          console.log(`Page changed to: ${page}`);
         }}
       />
     </div>
-  )
+  );
 }

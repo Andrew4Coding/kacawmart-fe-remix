@@ -1,21 +1,21 @@
-import { formatDatee, formatPrice } from "~/lib/utils"
-import { Badge } from "~/components/ui/badge"
-import { Link } from "@remix-run/react"
+import { formatDatee, formatPrice } from "~/lib/utils";
+import { Badge } from "~/components/ui/badge";
+import { Link } from "@remix-run/react";
 
 interface OrderCardProps {
   order: {
-    id: string
-    deliveryStatus: string
-    totalPrice: number
-    totalProduct: number
-    createdAt: string
+    id: string;
+    deliveryStatus: string;
+    totalPrice: number;
+    totalProduct: number;
+    createdAt: string;
     product: Array<{
-      amount: number
+      amount: number;
       product: {
-        name: string
-      } | null
-    }> | null
-  }
+        name: string;
+      } | null;
+    }> | null;
+  };
 }
 
 export default function OrderCard({ order }: OrderCardProps) {
@@ -23,17 +23,17 @@ export default function OrderCard({ order }: OrderCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "DELIVERED":
-        return "bg-emerald-100 text-emerald-800"
+        return "bg-emerald-100 text-emerald-800";
       case "PENDING":
-        return "bg-amber-100 text-amber-800"
+        return "bg-amber-100 text-amber-800";
       case "SHIPPED":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "CANCELLED":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   // // Format price to currency
   // const formatPrice = (price: number) => {
@@ -49,10 +49,16 @@ export default function OrderCard({ order }: OrderCardProps) {
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:border-emerald-200 transition-all hover:shadow-md">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h3 className="font-semibold text-gray-800 mb-1">Order #{order.id.substring(0, 8)}...</h3>
-            <p className="text-sm text-gray-500">{formatDatee(new Date(order.createdAt))}</p>
+            <h3 className="font-semibold text-gray-800 mb-1">
+              Order #{order.id.substring(0, 8)}...
+            </h3>
+            <p className="text-sm text-gray-500">
+              {formatDatee(new Date(order.createdAt))}
+            </p>
           </div>
-          <Badge className={`${getStatusColor(order.deliveryStatus)}`}>{order.deliveryStatus}</Badge>
+          <Badge className={`${getStatusColor(order.deliveryStatus)}`}>
+            {order.deliveryStatus}
+          </Badge>
         </div>
 
         <div className="space-y-2">
@@ -73,11 +79,15 @@ export default function OrderCard({ order }: OrderCardProps) {
                 {order.product.slice(0, 2).map((item, index) => (
                   <li key={index} className="truncate">
                     {item.amount}x{" "}
-                    {item.product?.name ? item.product.name.substring(0, 30) + "..." : "Product name unavailable"}
+                    {item.product?.name
+                      ? item.product.name.substring(0, 30) + "..."
+                      : "Product name unavailable"}
                   </li>
                 ))}
                 {order.product.length > 2 && (
-                  <li className="text-emerald-600 text-xs">+{order.product.length - 2} more items</li>
+                  <li className="text-emerald-600 text-xs">
+                    +{order.product.length - 2} more items
+                  </li>
                 )}
               </ul>
             </div>
@@ -85,5 +95,5 @@ export default function OrderCard({ order }: OrderCardProps) {
         </div>
       </div>
     </Link>
-  )
+  );
 }

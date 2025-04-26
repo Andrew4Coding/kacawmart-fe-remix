@@ -1,23 +1,23 @@
-import { Button } from "~/components/ui/button"
-import { Link } from "@remix-run/react"
-import ReviewCard from "./review-card"
-import { Star } from "lucide-react"
+import { Button } from "~/components/ui/button";
+import { Link } from "@remix-run/react";
+import ReviewCard from "./review-card";
+import { Star } from "lucide-react";
 
 interface Review {
-  title: string
-  content: string
-  rating: number
-  customerId: string
-  customerName: string
-  createdAt?: string
+  title: string;
+  content: string;
+  rating: number;
+  customerId: string;
+  customerName: string;
+  createdAt?: string;
 }
 
 interface ProductReviewsSectionProps {
-  productId: string
-  productRating: number
-  ratingCount: number
-  reviews: Review[]
-  maxReviews?: number
+  productId: string;
+  productRating: number;
+  ratingCount: number;
+  reviews: Review[];
+  maxReviews?: number;
 }
 
 export default function ProductReviewsSection({
@@ -29,13 +29,15 @@ export default function ProductReviewsSection({
 }: ProductReviewsSectionProps) {
   // Generate stars based on rating
   const renderStars = (rating: number) => {
-    const fullStars = Math.floor(rating)
-    const hasHalfStar = rating - fullStars >= 0.5
-    const stars = []
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating - fullStars >= 0.5;
+    const stars = [];
 
     for (let i = 1; i <= 5; i++) {
       if (i <= fullStars) {
-        stars.push(<Star key={i} className="h-5 w-5 text-yellow-400 fill-yellow-400" />)
+        stars.push(
+          <Star key={i} className="h-5 w-5 text-yellow-400 fill-yellow-400" />,
+        );
       } else if (i === fullStars + 1 && hasHalfStar) {
         stars.push(
           <div key={i} className="relative">
@@ -44,16 +46,16 @@ export default function ProductReviewsSection({
               <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
             </div>
           </div>,
-        )
+        );
       } else {
-        stars.push(<Star key={i} className="h-5 w-5 text-gray-300" />)
+        stars.push(<Star key={i} className="h-5 w-5 text-gray-300" />);
       }
     }
-    return stars
-  }
+    return stars;
+  };
 
   // Display only a limited number of reviews
-  const displayedReviews = reviews.slice(0, maxReviews)
+  const displayedReviews = reviews.slice(0, maxReviews);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow">
@@ -68,7 +70,10 @@ export default function ProductReviewsSection({
           </div>
         </div>
         <Link to={`/products/${productId}/reviews`}>
-          <Button variant="outline" className="border-emerald-500 text-emerald-500 hover:bg-emerald-50">
+          <Button
+            variant="outline"
+            className="border-emerald-500 text-emerald-500 hover:bg-emerald-50"
+          >
             View All Reviews
           </Button>
         </Link>
@@ -87,12 +92,15 @@ export default function ProductReviewsSection({
       {reviews.length > maxReviews && (
         <div className="mt-6 text-center">
           <Link to={`/products/${productId}/reviews`}>
-            <Button variant="outline" className="border-emerald-500 text-emerald-500 hover:bg-emerald-50">
+            <Button
+              variant="outline"
+              className="border-emerald-500 text-emerald-500 hover:bg-emerald-50"
+            >
               See All {reviews.length} Reviews
             </Button>
           </Link>
         </div>
       )}
     </div>
-  )
+  );
 }

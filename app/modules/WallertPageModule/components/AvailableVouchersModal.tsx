@@ -19,9 +19,9 @@ export default function AvailableVouchersModal({
   const fetchAvailableVouchers = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/voucher');
+      const response = await fetch("/api/voucher");
       const data = await response.json();
-      
+
       // Convert object-with-numeric-keys to array
       const vouchers = Object.values(data) as Voucher[];
       setAvailableVouchers(vouchers);
@@ -38,19 +38,26 @@ export default function AvailableVouchersModal({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
         {/* ... header ... */}
-        
+
         {isLoading ? (
           <p>Loading vouchers...</p>
         ) : availableVouchers.length > 0 ? (
           <div className="grid grid-cols-1 gap-4">
             {availableVouchers.map((voucher) => (
               <div key={voucher.id} className="border p-4 rounded-lg">
-                <h3 className="font-bold">{voucher.discount?.code || 'Voucher'}</h3>
-                <p>Price: Rp {voucher.price.toLocaleString('id-ID')}</p>
+                <h3 className="font-bold">
+                  {voucher.discount?.code || "Voucher"}
+                </h3>
+                <p>Price: Rp {voucher.price.toLocaleString("id-ID")}</p>
                 {voucher.discount && (
                   <>
                     <p>Value: {voucher.discount.value}</p>
-                    <p>Expires: {new Date(voucher.discount.expiredAt).toLocaleDateString()}</p>
+                    <p>
+                      Expires:{" "}
+                      {new Date(
+                        voucher.discount.expiredAt,
+                      ).toLocaleDateString()}
+                    </p>
                   </>
                 )}
                 <button

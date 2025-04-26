@@ -27,7 +27,10 @@ export default function BuyVoucherModal({
           <h2 className="text-xl font-semibold">
             {isBalanceEnough ? "Confirm Purchase" : "Insufficient Balance"}
           </h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
             ✕
           </button>
         </div>
@@ -37,10 +40,11 @@ export default function BuyVoucherModal({
             <p>Are you sure you want to buy this voucher?</p>
             <div className="mt-4 p-4 bg-gray-100 rounded">
               <h3 className="font-bold">{voucher.discount.code}</h3>
-              <p>Price: Rp {voucher.price.toLocaleString('id-ID')}</p>
-              <p>Your balance: Rp {walletBalance.toLocaleString('id-ID')}</p>
+              <p>Price: Rp {voucher.price.toLocaleString("id-ID")}</p>
+              <p>Your balance: Rp {walletBalance.toLocaleString("id-ID")}</p>
               <p className="mt-2">
-                Balance after purchase: Rp {(walletBalance - voucher.price).toLocaleString('id-ID')}
+                Balance after purchase: Rp{" "}
+                {(walletBalance - voucher.price).toLocaleString("id-ID")}
               </p>
             </div>
             <div className="mt-6 flex justify-end gap-2">
@@ -63,10 +67,11 @@ export default function BuyVoucherModal({
             <p>Sorry, your balance is not enough to purchase this voucher.</p>
             <div className="mt-4 p-4 bg-gray-100 rounded">
               <h3 className="font-bold">{voucher.discount.code}</h3>
-              <p>Price: Rp {voucher.price.toLocaleString('id-ID')}</p>
-              <p>Your balance: Rp {walletBalance.toLocaleString('id-ID')}</p>
+              <p>Price: Rp {voucher.price.toLocaleString("id-ID")}</p>
+              <p>Your balance: Rp {walletBalance.toLocaleString("id-ID")}</p>
               <p className="mt-2 text-red-500">
-                You need additional Rp {(voucher.price - walletBalance).toLocaleString('id-ID')}
+                You need additional Rp{" "}
+                {(voucher.price - walletBalance).toLocaleString("id-ID")}
               </p>
             </div>
             <div className="mt-6 flex justify-end">
